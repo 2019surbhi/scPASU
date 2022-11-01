@@ -1,6 +1,6 @@
 # scPolyA
 
-#### *A Pipeline to repurpose scRNA-seq data for single cell polyadenylation analysis*
+#### *A pipeline to repurpose scRNA-seq data for single cell polyadenylation analysis*
 
 
 ## I. Generate Peak Reference
