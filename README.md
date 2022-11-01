@@ -1,6 +1,6 @@
 # scPolyA
 
-### *A Pipeline to repurpose scRNA-seq data for single cell polyadenylation analysis*
+#### *A Pipeline to repurpose scRNA-seq data for single cell polyadenylation analysis*
 
 
 ## I. Generate Peak Reference
@@ -12,7 +12,7 @@
 * This is useful when the user wants to perform use scPolyA or APA analysis for a subset (e.g. epithelial subset)
 
 #### Step 1(b): Deduplication
-Cellranger outputs BAM which still contains PCR duplicates and the pipeline removes them using UMI tools (add link)
+* Cellranger outputs BAM which still contains PCR duplicates and the pipeline removes them using UMI tools (add link)
 
 #### Step 1(c): Filter BAM ##
 * oligo dT priming methodss can lead to internal priming events and such reads need to be removed
@@ -24,15 +24,15 @@ Cellranger outputs BAM which still contains PCR duplicates and the pipeline remo
 * All BAM files for the given dataset are merged 
 
 #### Step 1(e): Split by strand ##  
-For downstream processes, the merged BAM is split by strand using samtools (add link)
+* For downstream processes, the merged BAM is split by strand using samtools (add link)
 
 ### Step 2: Find peaks and polyA reads
 
 #### Step 2(a): Find Peaks
-MACS2 is used to find peaks
+* MACS2 is used to find peaks
 
 #### Step 2(b): Find polya reads 
-A custom script (add link) from Github is used to find polyA tail containing reads
+* A custom script (add link) from Github is used to find polyA tail containing reads
 
 ### Step 3: Intersect peaks with polyA reads 
 * Using bedtools (add link), peaks are intersected with polyA reads
