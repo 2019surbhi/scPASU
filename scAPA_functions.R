@@ -223,6 +223,110 @@ return(res)
 
 
 
+##### This function is borrowed from Ting lab APA pipeline to perfor differential testing using t-test #####
+
+# myta:
+# nrepa:
+# nrepb:
+
+testTTest <- function(myta,nrepa,nrepb)
+{
+  dat <- myta$use.frac
+  # Found cases where both groups have zero variance and t-test failed on them, so have to flag this and pass 0 p-value
+  t.p <- lapply(1:nrow(dat),function(x){
+    #message(x);
+    #avec <- dat[x,][,1:4]
+    #bvec <- dat[x,][,5:8]
+    
+    # We have only 2 rep
+    avec <- dat[x,][,1:nrepa]
+    bvec <- dat[x,][,(nrepa+1):nrepb]
+    if((sum(avec==max(avec))==nrepa)&(sum(bvec==max(bvec))==nrepb))
+    {
+      return(0)
+    } else
+    {
+      td <- t.test(x=avec,y=bvec)
+      return(td$p.value)
+    }
+  })
+  t.p <- do.call(c,t.p)
+  t.padj <- p.adjust(t.p,method="fdr")
+  myta$res$ttest_p <- t.p
+  myta$res$ttest_padj <- t.padj
+  return(myta)
+}
+
+#### This function is borrowed from tinglab APA pipeline to perform differential testing using EdgeR ####
+
+testEdgeR <- function(myta)
+{
+  mycomp <- paste0(unique(myta$samp.sub$group)[1],"_vs_",unique(myta$samp.sub$group)[2])
+  message("Testing: ",mycomp)
+  
+  res <- myta$res
+  ann <- data.frame(tu=res$tu,pr=res$pr)
+  g <- as.character(myta$samp.sub$group)
+  adj <- factor(myta$samp.sub$batch)
+  cnt <- myta$counts.raw
+  y.all <- DGEList(counts=cnt,genes=ann,group=g)
+  y <- calcNormFactors(y.all)
+  design <- model.matrix(~ g + adj)
+  y <- estimateDisp(y, design, robust=TRUE)
+  fit <- glmQLFit(y, design, robust=TRUE)
+  
+  #pdf(file=paste0("output/edger_",mycomp,".pdf"))
+  pdf(file=paste0(edger_prefix,mycomp,".pdf"))
+  plotBCV(y)
+  plotQLDisp(fit)
+  plotMDS(y)
+  dev.off()
+  
+  qlf <- glmQLFTest(fit, coef=2)
+  sp <- diffSpliceDGE(fit, coef=2, geneid="tu", exonid="pr")
+  
+  myta$edger <- sp
+  
+  # Not all PR in sp
+  idx<-match(names(sp$exon.p.value),myta$res$pr)
+  myta$res$edger_exon_p<-rep(NA,nrow(myta$res))
+  myta$res$edger_exon_p[idx] <- sp$exon.p.value
+  myta$res$edger_exon_padj[idx] <- p.adjust(sp$exon.p.value,method="fdr")
+  
+  ftest <- sp$gene.p.value
+  ftest.adj <- ftest
+  ftest.adj[,1] <- p.adjust(ftest[,1],method="fdr")
+  simes <- sp$gene.Simes.p.value
+  
+  myta$res$edger_ftest_p <- ftest[match(res$tu,rownames(ftest))]
+  myta$res$edger_ftest_padj <- ftest.adj[match(res$tu,rownames(ftest.adj))]
+  
+  names(simes) <- res[match(names(simes),res$pr),]$tu
+  simes.adj <- p.adjust(simes,method="fdr")
+  
+  myta$res$edger_simes_p <- simes[match(res$tu,names(simes))]
+  myta$res$edger_simes_padj <- simes.adj[match(res$tu,names(simes.adj))]
+  
+  
+  return(myta)
+}
+
+##### Call significance #####
+
+callsig <- function(myta)
+{
+  # P-value and fraction delta
+  myta$res$batchadj_delta_sig <- ((abs(myta$res$b_minus_a_frac)>=0.1)&(myta$res$batchadj_padj<0.0001))
+  
+  # P-value and fold change
+  myta$res$batchadj_perfc_sig <- with(myta$res,(batchadj_padj<0.0001)&(abs(l2_b_over_a_frac)>log2(1.5))&((mean_a_frac>=0.05)|(mean_b_frac>=0.05)))
+  
+  # P-value and fold change and delta fraction (intersect set we want to use)
+  myta$res$int_sig <- myta$res$batchadj_delta_sig & myta$res$batchadj_perfc_sig 
+  
+  return(myta)
+}
+
 
 ##### This function creates subset of peak matrix by cluster cell barcode #####
 
