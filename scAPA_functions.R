@@ -266,7 +266,7 @@ subset_peaks_by_clus<-function(clus,merged_counts,meta)
   
   # If an entire cell is lost due to various filer, remove it
   rem<-which(is.na(select)==TRUE)
-  if(length(rem)==0)
+  if(length(rem)!=0)
     {select<-select[-rem]}
   
   clus_peak<-merged_counts[,select]
