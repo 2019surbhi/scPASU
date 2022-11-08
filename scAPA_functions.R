@@ -5,34 +5,43 @@
 # peak_mat: matrix with read count per peak (row) for each sample replicate (column)
 # meanmat: matrix with mean values per sample (each column is 1 sample)
 # peak_ref: Final annotated peak ref table with TU (transcription unit) assiged to each peak
-# 
-testAPA2<-function(stab,peak_mat,meanmat,peak_ref,jtu=jtu,a=a,b=b,adjust.var=adjust.var,prs_gt=prs_gt,ncpu=20)
+# jtu:
+# a: 1st sample to be tested
+# b: 2nd sample name to be tested
+# adjust.var: variable to adjust for in statistical testing. Default is 'batch'
+# min_peak: threshold for retaining TU with peaks greater than this number. Deafult =1 
+#
+
+testAPA2<-function(stab,peak_mat,meanmat,peak_ref,jtu=jtu,a=a,b=b,adjust.var='batch',min_peak,ncpu=20)
 {
 
-# Filter PRs based on read count within samples to be tested #
+# Filter peaks based on read count within samples to be tested #
+peak.expr <- rownames(meanmat)[(meanmat[,a]>=cov)|(meanmat[,b]>=cov)]
+  
+#peak.a <- rownames(meanmat)[(meanmat[,a]>=cov)]
+#peak.b <- rownames(meanmat)[(meanmat[,b]>=cov)]
+  
+#join.a <- peak_ref
+#join.a <- join.a[(join.a$peak %in% peak.a)&(join.a$unique_tu==TRUE),]
 
-peak.expr <- rownames(meanmat)[(meanmat[,a]>=cov)|(meanmat[,b]>=cov)] 
-peak.a <- rownames(meanmat)[(meanmat[,a]>=cov)]
-peak.b <- rownames(meanmat)[(meanmat[,b]>=cov)]
+#join.b <- peak_ref
+#join.b <- join.b[(join.b$peak %in% peak.b)&(join.b$unique_tu==TRUE),]
 
-
-join.a <- peak_ref
-join.a <- join.a[(join.a$peak %in% peak.a)&(join.a$unique_tu==TRUE),]
-
-join.b <- peak_ref
-join.b <- join.b[(join.b$peak %in% peak.b)&(join.b$unique_tu==TRUE),]
-
+# Retain only those peaks in this new peak ref that made the read cutoff (default 10) as well as assigned to unique TU (Transcription Unit) #
 join.keep <- peak_ref[((peak_ref$peak %in% peak.expr)&(peak_ref$unique_tu==TRUE)),]
   
-
+# Sanity checks #
 stopifnot(!str_detect(join.keep$over_tus,","))
 stopifnot(!str_detect(join.keep$flank_tus,","))
 stopifnot(all(join.keep$unique_peak))
 stopifnot(length(unique(join.keep$peak))==nrow(join.keep))
 stopifnot(class(join.keep$peak)=="character")
-#stopifnot(join.keep$peak %in% rownames(peak_mat))
+stopifnot(join.keep$peak %in% rownames(peak_mat))
+
+# Create data table for this new peak ref #
 join.keep  <- data.table(join.keep, key="tu")
 
+# Add relevant columns by TU #
 join.keep <- join.keep[,list(peak=peak,
                              type=type,
                              coding=coding,
@@ -43,20 +52,23 @@ join.keep <- join.keep[,list(peak=peak,
                              num_peak=length(peak)),
                        by="tu"]
 
-# Remove TU with 1 peak remaining after filtering
-tu_count<-join.keep$tu %>% count()
-rem<-which(tu_count$freq==1)
-rem_tu<-tu_count$x[rem]
-rem_tu_idx<-match(rem_tu,join.keep$tu)
-join.keep<-join.keep[-rem_tu_idx,]
+# Remove TU with 1 peak remaining after applying all filters #
+join.want <- join.want[num_pr > min_peak,] 
+  
+  
+#tu_count<-join.keep$tu %>% count()
+#rem<-which(tu_count$freq==1)
+#rem_tu<-tu_count$x[rem]
+#rem_tu_idx<-match(rem_tu,join.keep$tu)
+#join.keep<-join.keep[-rem_tu_idx,]
 
-# Now subset peak in peak_mat and meanmat
+# Now subset peak in peak_mat and meanmat to include only the peaks from this new peak ref #
 peak_mat<-peak_mat[join.keep$peak,]
 meanmat<-meanmat[join.keep$peak,]
+  
 stopifnot(rownames(peak_mat)==join.keep$peak)
 #rownames(mat) <- paste(join.keep$tu,join.keep$peak,sep=":")
 
-#stab<-compdt
 cd <- peak_mat[,stab$group %in% c(a,b)]
 sd <- stab[stab$group %in% c(a,b),]
 #sd <-colnames(peak_mat) %>% gsub('_[0-9]','',.)
@@ -213,3 +225,98 @@ res<-list(dxd=dxd,dxr=dxr,res=res,counts.raw=cd,counts.norm=counts.norm,use.frac
 
 return(res)
 }
+
+
+
+
+##### This function creates subset of peak matrix by cluster cell barcode #####
+
+# clus_name: name of cluster to create replicates for
+# merged counts: read counts for peaks per cell (merged for all samples)
+# meta: metadata dataframe
+
+subset_peaks_by_clus<-function(clus,merged_counts,meta)
+{
+  ## extract cluster cell barcodes ##
+  clus_idx<-which(meta$seurat_clusters==clus)
+  clus_bc<-meta$bc[clus_idx]
+  
+  ## Subset peak counts data ##
+  select<-match(clus_bc,colnames(merged_counts))
+  
+  # If an entire cell is lost due to various filer, remove it
+  rem<-which(is.na(select)==TRUE)
+  if(length(rem)==0)
+    {select<-select[-rem]}
+  
+  clus_peak<-merged_counts[,select]
+  return(clus_peak)
+}
+
+
+##### This function creates replicates for each cluster by sampling barcode #####
+# clus_name: name of cluster to create replicates for
+# peak_mat: peak x cell matrix corresponding to that cluster
+# nrep: number of replicates to create (with replacement). Default is 2
+# p: proportion of total cells to sample. Default is 0.7
+# seed: seed value. Default is 123
+
+create_replicates<-function(clus_name,peak_mat,nrep=2,p=0.7,seed=123)
+{
+  
+ bc<-colnames(peak_mat)
+ ncell<-length(bc)
+ 
+ rep<-list()
+ 
+ set.seed(seed)
+ for(i in 1:nrep)
+ {
+ subset_bc<-sample(bc,(p*ncell),replace = TRUE)
+ subset_mat<-peak_mat[,subset_bc]
+ rep[[i]]<-rowSums(subset_mat) %>% as.data.frame()
+ names(rep)[[i]]<-paste0(clus_name,'_',i)
+ }
+  
+ return(rep)
+}
+
+
+##### This function creates replicates of two given cluster and performs APA testing using DEXSeq wrapped in bulk APA analysis strategy published by our lab #####
+
+# merged_counts: merged peak x cell counts for all samples
+# meta: meta data dataframe
+# c1 & c2: seurat clusters identity for 1st and 2nd clusters
+# c1_nm & c2_nm: cluster names (this should match their names in sample sheet)
+
+APA_per_2clus<-function(merged_counts,meta,c1,c2,c1_nm,c2_nm)
+{
+
+# Create subset peak matrix for each cluster
+c1_peaks<-subset_peaks_by_clus(c1,merged_counts,meta)
+c2_peaks<-subset_peaks_by_clus(c2,merged_counts,meta)
+  
+# Create replicates # - adapt for more than 2 replicates?
+
+c1_rep_lst<-create_replicates(clus_name=c1_nm,peak_mat=c1_peaks,nrep=2,p=0.7,seed=123)
+c1_mat<-do.call(cbind,c1_rep_lst)
+colnames(c1_mat)<-names(c1_rep_lst)
+
+c2_rep_lst<-create_replicates(clus_name=c2_nm,peak_mat=c2_peaks,nrep=2,p=0.7,seed=123)
+c2_mat<-do.call(cbind,c2_rep_lst)
+colnames(c2_mat)<-names(c2_rep_lst)
+
+# Merge #
+peak_mat<-cbind(c1_mat,c2_mat) # same as mat
+
+# Now get mean matrix by calculating mean for each sample #
+  
+c1_mean<-apply(X =c1_mat,1,mean)
+c2_mean<-apply(X=c2_mat,1,mean)
+
+meanmat<-cbind(c1_mean,c2_mean) 
+colnames(meanmat)<-c(c1_nm,c2_nm)
+
+}
+
+
