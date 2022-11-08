@@ -1,3 +1,23 @@
+library(dplyr)
+library(stringi)
+library(stringr)
+library(readxl)
+library(openxlsx)
+library(data.table)
+library(matrixStats)
+library(gtools)
+
+library(ggplot2)
+library(reshape)
+
+library(Seurat)
+library(Rsamtools)
+library(GenomicRanges)
+library(BSgenome.Hsapiens.UCSC.hg19)
+library(BSgenome.Hsapiens.UCSC.hg38)
+library(edgeR)
+library(DEXSeq)
+
 
 ##### This function performs APA testing using DEXSeq and was adaped from Tinglab APA pipeline (https://github.com/2019surbhi/apa_atingLab2019/tree/master/01_polyAseq) #####
 
