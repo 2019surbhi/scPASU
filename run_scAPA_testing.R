@@ -2,6 +2,7 @@ source('scAPA_functions.R')
 
 # User inputs
 outdir<-'/home/sonas/APA/scAPA/'
+output_file<-'u10_uro_apa.rd'
 counts_file<-'u10_peak_counts.txt'
 
 # Read merged counts
@@ -48,4 +49,43 @@ stab$batch<- stab$batch %>% as.factor()
 cov<-10
 
 
+## Run APA testing ##
 
+dotests <- function(a,b,ncpu=4,min_peak=1)
+{
+	message("Testing: ",a," vs ",b)
+	mycomp <- paste0(a,"_vs_",b)
+	# Run without batch correction
+  ta <- testApa2(stab=stab,meanmat=meanmat,peak_ref=peak_ref,peak_mat=peak_mat,jtu=jtu,a=a,b=b,adjust.var=NULL,ncpu=ncpu,min_peak=min_peak)
+
+  # Run with batch correction
+  taadj <- testApa2(stab=stab,meanmat=meanmat,peak_ref=peak_ref,peak_mat=peak_mat,jtu=jtu,a=a,b=b,adjust.var=adjust.var,ncpu=ncpu,min_peak=min_peak)
+	list(ta=ta,taadj=taadj)
+
+}
+
+compnames <- paste0(comps$a,"_vs_",comps$b)
+apa <- lapply(1:nrow(comps),function(x) dotests(a=comps[x,]$a,b=comps[x,]$b,min_peak=min_peak))
+names(apa) <- compnames
+
+# Merge down the results to one table going forward
+handy::nsummary(apa)
+
+# Put the adj info into the main res so get one ta object for each
+
+tas <- lapply(apa,function(x){
+	x$taadj$res$noadj_p <- x$ta$res$p
+	x$taadj$res$noadj_padj <- x$ta$res$padj
+
+	x$taadj$res$batchadj_p <- x$taadj$res$p
+	x$taadj$res$batchadj_padj <- x$taadj$res$padj
+
+	x$taadj$res[,p:=NULL]
+	x$taadj$res[,padj:=NULL]
+
+	return(x$taadj)
+})
+
+apa <- tas
+
+save(apa,compress=T,file=output_file)
