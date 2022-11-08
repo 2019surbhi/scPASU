@@ -308,8 +308,12 @@ create_replicates<-function(clus_name,peak_mat,nrep=2,p=0.7,seed=123)
 # meta: meta data dataframe
 # c1 & c2: seurat clusters identity for 1st and 2nd clusters
 # c1_nm & c2_nm: cluster names (this should match their names in sample sheet)
+# adjust.var: variable to adjust for in statistical testing. Default is 'batch'
+# min_peak: threshold for retaining TU with peaks greater than this number. Deafult =1 
+# outdir: dir path to save APA outputfiles to
 
-APA_per_2clus<-function(merged_counts,meta,c1,c2,c1_nm,c2_nm)
+
+APA_per_2clus<-function(merged_counts,meta,c1,c2,c1_nm,c2_nm,adjust.var='batch',min_peak=1,outdir)
 {
 
 # Create subset peak matrix for each cluster
@@ -336,6 +340,26 @@ c2_mean<-apply(X=c2_mat,1,mean)
 
 meanmat<-cbind(c1_mean,c2_mean) 
 colnames(meanmat)<-c(c1_nm,c2_nm)
+  
+# Run without batch correction
+ta <- testApa2(stab=stab,meanmat=meanmat,peak_ref=peak_ref,peak_mat=peak_mat,jtu=jtu,a=a,b=b,adjust.var=NULL,ncpu=ncpu,min_peak=min_peak)
+  
+# Run with batch correction
+taadj <- testApa2(stab=stab,meanmat=meanmat,peak_ref=peak_ref,peak_mat=peak_mat,jtu=jtu,a=a,b=b,adjust.var=adjust.var,ncpu=ncpu,min_peak=min_peak)
+
+taadj$res$noadj_p <- ta$res$p
+taadj$res$noadj_padj <- ta$res$padj
+x$taadj$res$noadj_sig <- x$ta$res$sig
+
+taadj$res$batchadj_p <- taadj$res$p
+taadj$res$batchadj_padj <- taadj$res$padj
+x$ta$res$batchadj_sig <- x$taadj$res$sig
+
+taadj$res[,p:=NULL]
+taadj$res[,padj:=NULL]
+
+output_file<-paste0(outdir,'apa_',c1_nm,'_',c2_nm,'.rd')
+save(taadj,compress=T,file=output_file)
 
 }
 
