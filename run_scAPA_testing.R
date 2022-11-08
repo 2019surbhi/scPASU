@@ -89,3 +89,27 @@ tas <- lapply(apa,function(x){
 apa <- tas
 
 save(apa,compress=T,file=output_file)
+	      
+## 2. Run t test ##
+nrepa<-2
+nrepb<-2
+
+apa.tt<-testTTest(apa,nrepa,nrepb)
+write.xlsx(apa.tt$res,paste0(outdir,'Differential_usage_ttest.xlsx'))
+
+## 3. Run EdgeR ##
+edger_prefix <- file.path(outdir,'edger_')
+apa.alt <- testEdgeR(apa.tt)
+
+write.xlsx(apa.alt$res,paste0(outdir,'Differential_usage_edger.xlsx'))
+save(apa.alt,file=paste0(outdir,'apa.alt.rd'),compress=T)
+
+## 4. Check significance ##
+apa.sig<-callsig(apa.alt)
+save(apa.sig,file=paste0(outdir,'apa.sig.rd'),compress=T)
+
+tab<-apa.sig$res
+write.xlsx(tab,paste0(outdir,'Differential_usage_w_sig.xlsx'))
+
+
+
