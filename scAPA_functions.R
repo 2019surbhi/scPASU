@@ -287,34 +287,40 @@ create_replicates<-function(clus_name,peak_mat,nrep=2,p=0.7,seed=123)
 # min_peak: threshold for retaining TU with peaks greater than this number. Deafult =1 
 # outdir: dir path to save APA outputfiles to
 
+create_apa_inputs<-function(merged_counts,meta,c1,c2,c1_nm,c2_nm)
+{
+  
+  # Create subset peak matrix for each cluster
+  c1_peaks<-subset_peaks_by_clus(c1,merged_counts,meta)
+  c2_peaks<-subset_peaks_by_clus(c2,merged_counts,meta)
+  
+  # Create replicates # - adapt for more than 2 replicates?
+  c1_rep_lst<-create_replicates(clus_name=c1_nm,peak_mat=c1_peaks,nrep=2,p=0.7,seed=123)
+  c1_mat<-do.call(cbind,c1_rep_lst)
+  colnames(c1_mat)<-names(c1_rep_lst)
+  
+  c2_rep_lst<-create_replicates(clus_name=c2_nm,peak_mat=c2_peaks,nrep=2,p=0.7,seed=123)
+  c2_mat<-do.call(cbind,c2_rep_lst)
+  colnames(c2_mat)<-names(c2_rep_lst)
+  
+  # Merge #
+  peak_mat<-cbind(c1_mat,c2_mat) # same as mat
+  
+  # Now get mean matrix by calculating mean for each sample #
+  
+  c1_mean<-apply(X =c1_mat,1,mean)
+  c2_mean<-apply(X=c2_mat,1,mean)
+  
+  meanmat<-cbind(c1_mean,c2_mean) 
+  colnames(meanmat)<-c(c1_nm,c2_nm)
+  
+  return(list(peak_mat,meanmat))
+  
+}
 
 APA_per_2clus<-function(merged_counts,meta,c1,c2,c1_nm,c2_nm,adjust.var='batch',min_peak=1,outdir)
 {
 
-# Create subset peak matrix for each cluster
-c1_peaks<-subset_peaks_by_clus(c1,merged_counts,meta)
-c2_peaks<-subset_peaks_by_clus(c2,merged_counts,meta)
-  
-# Create replicates # - adapt for more than 2 replicates?
-
-c1_rep_lst<-create_replicates(clus_name=c1_nm,peak_mat=c1_peaks,nrep=2,p=0.7,seed=123)
-c1_mat<-do.call(cbind,c1_rep_lst)
-colnames(c1_mat)<-names(c1_rep_lst)
-
-c2_rep_lst<-create_replicates(clus_name=c2_nm,peak_mat=c2_peaks,nrep=2,p=0.7,seed=123)
-c2_mat<-do.call(cbind,c2_rep_lst)
-colnames(c2_mat)<-names(c2_rep_lst)
-
-# Merge #
-peak_mat<-cbind(c1_mat,c2_mat) # same as mat
-
-# Now get mean matrix by calculating mean for each sample #
-  
-c1_mean<-apply(X =c1_mat,1,mean)
-c2_mean<-apply(X=c2_mat,1,mean)
-
-meanmat<-cbind(c1_mean,c2_mean) 
-colnames(meanmat)<-c(c1_nm,c2_nm)
   
 # Run without batch correction
 ta <- testApa2(stab=stab,meanmat=meanmat,peak_ref=peak_ref,peak_mat=peak_mat,jtu=jtu,a=a,b=b,adjust.var=NULL,ncpu=ncpu,min_peak=min_peak)
