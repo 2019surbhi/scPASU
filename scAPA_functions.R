@@ -21,18 +21,19 @@ join.a <- join.a[(join.a$peak %in% peak.a)&(join.a$unique_tu==TRUE),]
 
 join.b <- peak_ref
 join.b <- join.b[(join.b$peak %in% peak.b)&(join.b$unique_tu==TRUE),]
-length(unique(join.b$tu))
 
-join.want <- peak_ref[((peak_ref$peak %in% peak.expr)&(peak_ref$unique_tu==TRUE)),]
-stopifnot(!str_detect(join.want$over_tus,","))
-stopifnot(!str_detect(join.want$flank_tus,","))
-stopifnot(all(join.want$unique_peak))
-stopifnot(length(unique(join.want$peak))==nrow(join.want))
-stopifnot(class(join.want$peak)=="character")
-#stopifnot(join.want$peak %in% rownames(peak_mat))
-join.want  <- data.table(join.want, key="tu")
+join.keep <- peak_ref[((peak_ref$peak %in% peak.expr)&(peak_ref$unique_tu==TRUE)),]
+  
 
-join.want <- join.want[,list(peak=peak,
+stopifnot(!str_detect(join.keep$over_tus,","))
+stopifnot(!str_detect(join.keep$flank_tus,","))
+stopifnot(all(join.keep$unique_peak))
+stopifnot(length(unique(join.keep$peak))==nrow(join.keep))
+stopifnot(class(join.keep$peak)=="character")
+#stopifnot(join.keep$peak %in% rownames(peak_mat))
+join.keep  <- data.table(join.keep, key="tu")
+
+join.keep <- join.keep[,list(peak=peak,
                              type=type,
                              coding=coding,
                              unique_peak=unique_peak,
@@ -43,17 +44,17 @@ join.want <- join.want[,list(peak=peak,
                        by="tu"]
 
 # Remove TU with 1 peak remaining after filtering
-tu_count<-join.want$tu %>% count()
+tu_count<-join.keep$tu %>% count()
 rem<-which(tu_count$freq==1)
 rem_tu<-tu_count$x[rem]
-rem_tu_idx<-match(rem_tu,join.want$tu)
-join.want<-join.want[-rem_tu_idx,]
+rem_tu_idx<-match(rem_tu,join.keep$tu)
+join.keep<-join.keep[-rem_tu_idx,]
 
 # Now subset peak in peak_mat and meanmat
-peak_mat<-peak_mat[join.want$peak,]
-meanmat<-meanmat[join.want$peak,]
-stopifnot(rownames(peak_mat)==join.want$peak)
-#rownames(mat) <- paste(join.want$tu,join.want$peak,sep=":")
+peak_mat<-peak_mat[join.keep$peak,]
+meanmat<-meanmat[join.keep$peak,]
+stopifnot(rownames(peak_mat)==join.keep$peak)
+#rownames(mat) <- paste(join.keep$tu,join.keep$peak,sep=":")
 
 #stab<-compdt
 cd <- peak_mat[,stab$group %in% c(a,b)]
@@ -63,17 +64,17 @@ sd <- stab[stab$group %in% c(a,b),]
 stopifnot(stab$sample==colnames(peak_mat))
 
 # Subset peak ref based on what is found in the two comp groups
-idx<-match(join.want$peak,peak_ref$peak)
-head(join.want$peak)
+idx<-match(join.keep$peak,peak_ref$peak)
+head(join.keep$peak)
 peak_ref$peak[idx] %>% head()
 
 # Create genomic range
 peak<-peak_ref[idx,c('chr','start','end','strand','peak')]
 peak_gr<-makeGRangesFromDataFrame(peak,keep.extra.columns = TRUE)
-#fr <- peak$peak[peak$peak$peak %in% join.want$peak]
-#fr <- fr[match(join.want$peak,fr$peak)]
+#fr <- peak$peak[peak$peak$peak %in% join.keep$peak]
+#fr <- fr[match(join.keep$peak,fr$peak)]
 
-stopifnot(peak_gr$peak==join.want$peak)
+stopifnot(peak_gr$peak==join.keep$peak)
 rownames(cd) <- NULL
 
 sd.use <- data.frame(group=sd$group)
@@ -95,14 +96,14 @@ if(is.null(adjust.var))
 message("Design Formula: ",design)
 
 
-exon_num <- join.want[,list(paste0("E",1:length(peak)),peak=peak),by="tu"]
-stopifnot(exon_num$tu==join.want$tu)
-stopifnot(exon_num$peak==join.want$peak)
-join.want$exon_num <- exon_num$V1
-join.want$key <- paste(join.want$tu,join.want$exon_num,sep=":")
+exon_num <- join.keep[,list(paste0("E",1:length(peak)),peak=peak),by="tu"]
+stopifnot(exon_num$tu==join.keep$tu)
+stopifnot(exon_num$peak==join.keep$peak)
+join.keep$exon_num <- exon_num$V1
+join.keep$key <- paste(join.keep$tu,join.keep$exon_num,sep=":")
 
 
-dxd <- DEXSeqDataSet(countData=cd, sampleData=sd.use, design=as.formula(design), featureID=join.want$exon_num, groupID=join.want$tu, featureRanges=pr_gr)
+dxd <- DEXSeqDataSet(countData=cd, sampleData=sd.use, design=as.formula(design), featureID=join.keep$exon_num, groupID=join.keep$tu, featureRanges=pr_gr)
 
 # Run tests
 message("Estimating size factors")
@@ -130,12 +131,12 @@ dxr <- DEXSeqResults(dxd)
 counts.norm <- counts(dxd, normalized=TRUE)
 counts.norm <- counts.norm[,1:nrow(sd)]
 colnames(counts.norm) <- sd$sample
-stopifnot(rownames(counts.norm)==join.want$key)
-rownames(counts.norm) <- join.want$peak
+stopifnot(rownames(counts.norm)==join.keep$key)
+rownames(counts.norm) <- join.keep$peak
 
 # Start building nice results list
 dt <- data.table(as.data.frame(dxr))
-out <- with(dt,data.table(tu=groupID,peak=join.want$peak,p=pvalue,padj=padj,dexl2fc_b_over_a=get(paste0("log2fold_",a,"_",b)),chr=genomicData.seqnames,start=genomicData.start,end=genomicData.end,strand=genomicData.strand))
+out <- with(dt,data.table(tu=groupID,peak=join.keep$peak,p=pvalue,padj=padj,dexl2fc_b_over_a=get(paste0("log2fold_",a,"_",b)),chr=genomicData.seqnames,start=genomicData.start,end=genomicData.end,strand=genomicData.strand))
 out$gene_name <- red_ens$tu[match(out$tu,red_ens$tu$tu)]$name
 stopifnot(paste0(out$peak)==rownames(counts.norm))
 
@@ -175,7 +176,7 @@ stopifnot(!is.na(m))
 cas <- cas[m,]
 use.frac <- cas[,c(-1,-2)]
 stopifnot(nrow(use.frac)==nrow(out))
-rownames(use.frac) <- join.want$peak
+rownames(use.frac) <- join.keep$peak
 
 #browser()
 
