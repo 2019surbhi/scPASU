@@ -32,202 +32,208 @@ library(DEXSeq)
 # min_peak: threshold for retaining TU with peaks greater than this number. Deafult =1 
 #
 
-testAPA2<-function(stab,peak_mat,meanmat,peak_ref,a=a,b=b,adjust.var='batch',min_peak,ncpu=20)
+testAPA2<-function(stab,peak_mat,meanmat,peak_ref,a=a,b=b,adjust.var=NULL,min_peak,ncpu=20)
 {
-
-message("Creating inputs for DEXSeq")
   
-# Filter peaks based on read count within samples to be tested #
-peak.expr <- rownames(meanmat)[(meanmat[,a]>=cov)|(meanmat[,b]>=cov)]
+  message("Creating inputs for DEXSeq")
   
-# Retain only those peaks in this new peak ref that made the read cutoff (default 10) as well as assigned to unique TU (Transcription Unit) #
-join.keep <- peak_ref[((peak_ref$peak %in% peak.expr)&(peak_ref$unique_tu==TRUE)),]
+  # Filter peaks based on read count within samples to be tested #
+  peak.expr <- rownames(meanmat)[(meanmat[,a]>=cov)|(meanmat[,b]>=cov)]
   
-# Sanity checks #
-stopifnot(!str_detect(join.keep$over_tus,","))
-stopifnot(!str_detect(join.keep$flank_tus,","))
-stopifnot(all(join.keep$unique_peak)) 
-stopifnot(length(unique(join.keep$peak))==nrow(join.keep))
-stopifnot(class(join.keep$peak)=="character")
-stopifnot(join.keep$peak %in% rownames(peak_mat))
-
-# Create data table for this new peak ref #
-join.keep  <- data.table(join.keep, key="tu")
-
-# Add relevant columns by TU #
-join.keep <- join.keep[,list(peak=peak,
-                             type=type,
-                             coding=coding,
-                             unique_peak=unique_peak,
-                             unique_tu=unique_tu,
-                             over_tus=over_tus,
-                             flank_tus=flank_tus,
-                             num_peak=length(peak)),
-                       by="tu"]
-
-# Remove TU with 1 peak remaining after applying all filters #
-join.keep <- join.keep[num_peak > min_peak,] 
+  # Retain only those peaks in this new peak ref that made the read cutoff (default 10) as well as assigned to unique TU (Transcription Unit) #
+  join.keep <- peak_ref[((peak_ref$peak %in% peak.expr)&(peak_ref$unique_tu==TRUE)),]
   
-#tu_count<-join.keep$tu %>% count()
-#rem<-which(tu_count$freq==1)
-#rem_tu<-tu_count$x[rem]
-#rem_tu_idx<-match(rem_tu,join.keep$tu)
-#join.keep<-join.keep[-rem_tu_idx,]
-
-# Now subset peak in peak_mat and meanmat to include only the peaks from this new peak ref #
-peak_mat<-peak_mat[join.keep$peak,]
-meanmat<-meanmat[join.keep$peak,]
+  # Sanity checks #
+  stopifnot(!str_detect(join.keep$over_tus,","))
+  stopifnot(!str_detect(join.keep$flank_tus,","))
+  stopifnot(all(join.keep$unique_peak)) 
+  stopifnot(length(unique(join.keep$peak))==nrow(join.keep))
+  stopifnot(class(join.keep$peak)=="character")
+  stopifnot(join.keep$peak %in% rownames(peak_mat))
   
-stopifnot(rownames(peak_mat)==join.keep$peak)
+  # Create data table for this new peak ref #
+  join.keep  <- data.table(join.keep, key="tu")
   
-cd <- peak_mat[,stab$group %in% c(a,b)]
-sd <- stab[stab$group %in% c(a,b),]
-
-stopifnot(sd$sample==colnames(peak_mat))
-
-# Subset peak ref based on what is found in the two comp groups
-idx<-match(join.keep$peak,peak_ref$peak)
-
-# Create genomic range
-peak<-peak_ref[idx,c('chr','start','end','strand','peak')]
-peak_gr<-makeGRangesFromDataFrame(peak,keep.extra.columns = TRUE)
-
-stopifnot(peak_gr$peak==join.keep$peak)
-rownames(cd) <- NULL
-
-sd.use <- data.frame(group=sd$group)
-sd.use$group <- factor(sd.use$group,ordered=F)
-
+  # Add relevant columns by TU #
+  join.keep <- join.keep[,list(peak=peak,
+                               type=type,
+                               coding=coding,
+                               unique_peak=unique_peak,
+                               unique_tu=unique_tu,
+                               over_tus=over_tus,
+                               flank_tus=flank_tus,
+                               num_peak=length(peak)),
+                         by="tu"]
   
-message("Building DEXSeqDataSet object")
-if(is.null(adjust.var))
-{
-  design <- "~ sample + exon + group:exon"
-}else
-{
-  design <- paste0("~ sample + exon + adjust:exon + group:exon")
-  sd.use$adjust <- factor(with(sd,get(adjust.var)))
+  # Remove TU with 1 peak remaining after applying all filters #
+  join.keep <- join.keep[num_peak > min_peak,] 
+  
+  #tu_count<-join.keep$tu %>% count()
+  #rem<-which(tu_count$freq==1)
+  #rem_tu<-tu_count$x[rem]
+  #rem_tu_idx<-match(rem_tu,join.keep$tu)
+  #join.keep<-join.keep[-rem_tu_idx,]
+  
+  # Now subset peak in peak_mat and meanmat to include only the peaks from this new peak ref #
+  peak_mat<-peak_mat[join.keep$peak,]
+  meanmat<-meanmat[join.keep$peak,]
+  
+  stopifnot(rownames(peak_mat)==join.keep$peak)
+  
+  sd <- stab[stab$group %in% c(a,b),] %>% arrange(.,group)
+  
+  # Sort by peak mat column
+  stopifnot(sd$sample %in% colnames(peak_mat))
+  sd<-sd[match(sd$sample,colnames(peak_mat)),]
+  cd <- peak_mat
+  
+  #cd <- peak_mat[,stab$group %in% c(a,b)]
+  # cols<-colnames(cd) %>% sort()
+  # cd<-cd[,cols]
+  
+  
+  # Subset peak ref based on what is found in the two comp groups
+  idx<-match(join.keep$peak,peak_ref$peak)
+  
+  # Create genomic range
+  peak<-peak_ref[idx,c('chr','start','end','strand','peak')]
+  peak_gr<-makeGRangesFromDataFrame(peak,keep.extra.columns = TRUE)
+  
+  stopifnot(peak_gr$peak==join.keep$peak)
+  rownames(cd) <- NULL
+  
+  sd.use <- data.frame(group=sd$group)
+  sd.use$group <- factor(sd.use$group,ordered=F)
+  
+  
+  message("Building DEXSeqDataSet object")
+  if(is.null(adjust.var))
+  {
+    design <- "~ sample + exon + group:exon"
+  }else
+  {
+    design <- paste0("~ sample + exon + adjust:exon + group:exon")
+    sd.use$adjust <- factor(with(sd,get(adjust.var)))
+  }
+  message("Design Formula: ",design)
+  
+  exon_num <- join.keep[,list(paste0("E",1:length(peak)),peak=peak),by="tu"]
+  stopifnot(exon_num$tu==join.keep$tu)
+  stopifnot(exon_num$peak==join.keep$peak)
+  join.keep$exon_num <- exon_num$V1
+  join.keep$key <- paste(join.keep$tu,join.keep$exon_num,sep=":")
+  
+  
+  dxd <- DEXSeqDataSet(countData=cd, sampleData=sd.use, design=as.formula(design), featureID=join.keep$exon_num, groupID=join.keep$tu, featureRanges=peak_gr)
+  
+  # Run tests
+  message("Estimating size factors")
+  dxd <- DEXSeq::estimateSizeFactors(dxd)
+  message("Estimating dispersions")
+  dxd <- DEXSeq::estimateDispersions(dxd)
+  
+  if(is.null(adjust.var))
+  {
+    dxd<-testForDEU(dxd)
+  }else
+  {
+    message("Tesing w/ adjustment for variable: ", adjust.var)
+    dxd <- testForDEU(dxd,fullModel=as.formula("~ sample + exon + adjust:exon + group:exon"),reducedModel=as.formula("~ sample + exon + adjust:exon"))
+  }
+  
+  
+  dxd <- estimateExonFoldChanges(dxd,fitExpToVar="group",BPPARAM=MulticoreParam(workers=ncpu))
+  
+  # Pull APA results table
+  message("Extracting DEXSeqResults")
+  dxr <- DEXSeqResults(dxd)
+  
+  # Fetch normalized counts
+  counts.norm <- DEXSeq::counts(dxd, normalized=TRUE)
+  counts.norm <- counts.norm[,1:nrow(sd)]
+  colnames(counts.norm) <- sd$sample
+  stopifnot(rownames(counts.norm)==join.keep$key)
+  rownames(counts.norm) <- join.keep$peak
+  
+  # Start building nice results list
+  dt <- data.table(as.data.frame(dxr))
+  out <- with(dt,data.table(tu=groupID,peak=join.keep$peak,p=pvalue,padj=padj,dexl2fc_b_over_a=get(paste0("log2fold_",b,"_",a)),chr=genomicData.seqnames,start=genomicData.start,end=genomicData.end,strand=genomicData.strand))
+  
+  # Extract gene name
+  genes<-strsplit(out$peak,split=':') %>% sapply(.,'[[',2) 
+  out$gene_name<-genes
+  stopifnot(out$peak==rownames(counts.norm))
+  
+  # Make usage matrices
+  c2 <- data.table(cd)
+  c2$peak <- out$peak
+  c2$tu <- out$tu
+  cm <- melt(c2,id.vars=c("peak","tu"))
+  stopifnot(!is.na(cm$value))
+  
+  # Within each TU and each sample, get each percent as percent of total
+  cm<-as.data.table(cm)
+  m2 <- cm[,list(peak=peak,raw_count=value,use_frac=value/sum(value),tu_zero=sum(value)==0),by=c("tu","variable")]
+  stopifnot(nrow(m2[is.na(use_frac),])==sum(m2$tu_zero))
+  
+  m2[is.na(use_frac),use_frac:=0]
+  stopifnot(!is.na(m2$use_frac))
+  
+  m2$group <- stab[match(m2$variable,stab$sample),]$group
+  stopifnot(!is.na(m2$group))
+  
+  # Groupwise usage means
+  m3 <- m2[,list(tu=tu[1],mean_a=mean(use_frac[group==a]),mean_b=mean(use_frac[group==b])),by=c("peak")]
+  m3$b_minus_a <- m3$mean_b-m3$mean_a
+  m3$l2_b_over_a <- log2((m3$mean_b+0.0001)/(m3$mean_a+0.0001))
+  stopifnot(out$tu==m3$tu)
+  stopifnot(out$peak==m3$peak)
+  setnames(m3,paste0(colnames(m3),"_frac"))
+  
+  cas <- cast(m2,formula="peak+tu~variable",value="use_frac")
+  caskey <- paste(cas$tu,cas$peak,sep=":")
+  outkey <- paste(out$tu,out$peak,sep=":")
+  m <- match(outkey,caskey)
+  stopifnot(!is.na(m))
+  cas <- cas[m,]
+  use.frac <- cas[,c(-1,-2)]
+  stopifnot(nrow(use.frac)==nrow(out))
+  rownames(use.frac) <- join.keep$peak
+  
+  
+  myuse <- use.frac
+  colnames(myuse) <- paste0(colnames(use.frac),"_frac")
+  mynorm <- counts.norm
+  colnames(mynorm) <- paste0(colnames(mynorm),"_norm")
+  
+  nmeans_a <- rowMeans(counts.norm[,as.character(stab[stab$group==a,]$sample)])
+  nmeans_b <- rowMeans(counts.norm[,as.character(stab[stab$group==b,]$sample)])
+  
+  dt <- data.table(mean_a=nmeans_a,mean_b=nmeans_b,b_minus_a=nmeans_b-nmeans_a,l2_b_over_a=log2((nmeans_b+0.0001)/(nmeans_a+0.0001)))
+  setnames(dt,paste0(colnames(dt),"_norm"))
+  
+  res <- cbind(out,mynorm,dt,myuse,m3[,c("mean_a_frac","mean_b_frac","b_minus_a_frac","l2_b_over_a_frac"),with=F])
+  
+  rownames(cd) <- res$peak
+  
+  #write.xlsx(res,paste0(outdir,'Differential_usage.xlsx'))
+  #write.xlsx(use.frac,paste0(outdir,'Frac_usage.xlsx'))
+  
+  #write.xlsx(res,paste0(outdir,'Differential_usage_w_adj.xlsx'))
+  #write.xlsx(use.frac,paste0(outdir,'Frac_usage_w_adj.xlsx'))
+  
+  # Return
+  res<-list(dxd=dxd,dxr=dxr,res=res,counts.raw=cd,counts.norm=counts.norm,use.frac=use.frac,a=a,b=b,stab.sub=sd)
+  
+  return(res)
 }
-message("Design Formula: ",design)
-
-exon_num <- join.keep[,list(paste0("E",1:length(peak)),peak=peak),by="tu"]
-stopifnot(exon_num$tu==join.keep$tu)
-stopifnot(exon_num$peak==join.keep$peak)
-join.keep$exon_num <- exon_num$V1
-join.keep$key <- paste(join.keep$tu,join.keep$exon_num,sep=":")
-
-
-dxd <- DEXSeqDataSet(countData=cd, sampleData=sd.use, design=as.formula(design), featureID=join.keep$exon_num, groupID=join.keep$tu, featureRanges=peak_gr)
-
-# Run tests
-message("Estimating size factors")
-dxd <- DEXSeq::estimateSizeFactors(dxd)
-message("Estimating dispersions")
-dxd <- DEXSeq::estimateDispersions(dxd)
-
-if(is.null(adjust.var))
-{
-  dxd <- testForDEU(dxd)
-}else
-{
-  message("Tesing w/ adjustment for variable: ", adjust.var)
-  dxd <- testForDEU(dxd,fullModel=as.formula("~ sample + exon + adjust:exon + group:exon"),reducedModel=as.formula("~ sample + exon + adjust:exon"))
-}
-
-
-dxd <- estimateExonFoldChanges(dxd,fitExpToVar="group",BPPARAM=MulticoreParam(workers=ncpu))
-
-# Pull APA results table
-message("Extracting DEXSeqResults")
-dxr <- DEXSeqResults(dxd)
-
-# Fetch normalized counts
-counts.norm <- DEXSeq::counts(dxd, normalized=TRUE)
-counts.norm <- counts.norm[,1:nrow(sd)]
-colnames(counts.norm) <- sd$sample
-stopifnot(rownames(counts.norm)==join.keep$key)
-rownames(counts.norm) <- join.keep$peak
-
-# Start building nice results list
-dt <- data.table(as.data.frame(dxr))
-out <- with(dt,data.table(tu=groupID,peak=join.keep$peak,p=pvalue,padj=padj,dexl2fc_b_over_a=get(paste0("log2fold_",b,"_",a)),chr=genomicData.seqnames,start=genomicData.start,end=genomicData.end,strand=genomicData.strand))
-
-# Extract gene name
-genes<-strsplit(out$peak,split=':') %>% sapply(.,'[[',2) 
-out$gene_name<-genes
-stopifnot(out$peak==rownames(counts.norm))
-
-# Make usage matrices
-c2 <- data.table(cd)
-c2$peak <- out$peak
-c2$tu <- out$tu
-cm <- melt(c2,id.vars=c("peak","tu"))
-stopifnot(!is.na(cm$value))
-  
-# Within each TU and each sample, get each percent as percent of total
-cm<-as.data.table(cm)
-m2 <- cm[,list(peak=peak,raw_count=value,use_frac=value/sum(value),tu_zero=sum(value)==0),by=c("tu","variable")]
-stopifnot(nrow(m2[is.na(use_frac),])==sum(m2$tu_zero))
-
-m2[is.na(use_frac),use_frac:=0]
-stopifnot(!is.na(m2$use_frac))
-
-m2$group <- stab[match(m2$variable,stab$sample),]$group
-stopifnot(!is.na(m2$group))
-
-# Groupwise usage means
-m3 <- m2[,list(tu=tu[1],mean_a=mean(use_frac[group==a]),mean_b=mean(use_frac[group==b])),by=c("peak")]
-m3$b_minus_a <- m3$mean_b-m3$mean_a
-m3$l2_b_over_a <- log2((m3$mean_b+0.0001)/(m3$mean_a+0.0001))
-stopifnot(out$tu==m3$tu)
-stopifnot(out$peak==m3$peak)
-setnames(m3,paste0(colnames(m3),"_frac"))
-
-cas <- cast(m2,formula="peak+tu~variable",value="use_frac")
-caskey <- paste(cas$tu,cas$peak,sep=":")
-outkey <- paste(out$tu,out$peak,sep=":")
-m <- match(outkey,caskey)
-stopifnot(!is.na(m))
-cas <- cas[m,]
-use.frac <- cas[,c(-1,-2)]
-stopifnot(nrow(use.frac)==nrow(out))
-rownames(use.frac) <- join.keep$peak
-
-
-myuse <- use.frac
-colnames(myuse) <- paste0(colnames(use.frac),"_frac")
-mynorm <- counts.norm
-colnames(mynorm) <- paste0(colnames(mynorm),"_norm")
-
-nmeans_a <- rowMeans(counts.norm[,as.character(stab[stab$group==a,]$sample)])
-nmeans_b <- rowMeans(counts.norm[,as.character(stab[stab$group==b,]$sample)])
-
-dt <- data.table(mean_a=nmeans_a,mean_b=nmeans_b,b_minus_a=nmeans_b-nmeans_a,l2_b_over_a=log2((nmeans_b+0.0001)/(nmeans_a+0.0001)))
-setnames(dt,paste0(colnames(dt),"_norm"))
-
-res <- cbind(out,mynorm,dt,myuse,m3[,c("mean_a_frac","mean_b_frac","b_minus_a_frac","l2_b_over_a_frac"),with=F])
-
-rownames(cd) <- res$peak
-
-write.xlsx(res,paste0(outdir,'Differential_usage.xlsx'))
-write.xlsx(use.frac,paste0(outdir,'Frac_usage.xlsx'))
-
-write.xlsx(res,paste0(outdir,'Differential_usage_w_adj.xlsx'))
-write.xlsx(use.frac,paste0(outdir,'Frac_usage_w_adj.xlsx'))
-
-# Return
-res<-list(dxd=dxd,dxr=dxr,res=res,counts.raw=cd,counts.norm=counts.norm,use.frac=use.frac,a=a,b=b,stab.sub=sd)
-
-return(res)
-}
-
 
 
 ##### This function is borrowed from Ting lab APA pipeline to perfor differential testing using t-test #####
 
-# myta:
-# nrepa:
-# nrepb:
+# myta: apa obj with non adjusted and adjusted p val from DEXseq testing
+# nrepa: n rep in group a (or group 1)
+# nrepb: n rep in group b (or group 2)
 
 testTTest <- function(myta,nrepa,nrepb)
 {
@@ -257,17 +263,20 @@ testTTest <- function(myta,nrepa,nrepb)
   return(myta)
 }
 
-#### This function is borrowed from tinglab APA pipeline to perform differential testing using EdgeR ####
+##### This function is borrowed from tinglab APA pipeline to perform differential testing using EdgeR #####
 
+# myta: apa object with DEXSeq and t-test results
+  
+# Run function
 testEdgeR <- function(myta)
 {
-  mycomp <- paste0(unique(myta$samp.sub$group)[1],"_vs_",unique(myta$samp.sub$group)[2])
+  mycomp<-paste0(unique(myta$stab.sub$group)[1],"_vs_",unique(myta$stab.sub$group)[2])
   message("Testing: ",mycomp)
   
   res <- myta$res
-  ann <- data.frame(tu=res$tu,pr=res$pr)
-  g <- as.character(myta$samp.sub$group)
-  adj <- factor(myta$samp.sub$batch)
+  ann <- data.frame(tu=res$tu,pr=res$peak)
+  g <- as.character(myta$stab.sub$group)
+  adj <- factor(myta$stab.sub$batch)
   cnt <- myta$counts.raw
   y.all <- DGEList(counts=cnt,genes=ann,group=g)
   y <- calcNormFactors(y.all)
@@ -288,7 +297,7 @@ testEdgeR <- function(myta)
   myta$edger <- sp
   
   # Not all PR in sp
-  idx<-match(names(sp$exon.p.value),myta$res$pr)
+  idx<-match(names(sp$exon.p.value),myta$res$peak)
   myta$res$edger_exon_p<-rep(NA,nrow(myta$res))
   myta$res$edger_exon_p[idx] <- sp$exon.p.value
   myta$res$edger_exon_padj[idx] <- p.adjust(sp$exon.p.value,method="fdr")
@@ -311,6 +320,7 @@ testEdgeR <- function(myta)
   return(myta)
 }
 
+
 ##### Call significance #####
 
 callsig <- function(myta)
@@ -327,6 +337,19 @@ callsig <- function(myta)
   return(myta)
 }
 
+
+##### This function filters APA table to inlcude TU entires for which at least 1 peak tested significant by both FC and pvalue #####
+
+# tab: Final APA table 
+
+filter_for_sig<-function(tab)
+{
+  filt<-tab[which(tab$both_sig==TRUE),]
+  idx<-which(tab$tu %in% filt$tu)
+  filt_tab<-tab[idx,]
+  return(filt_tab)
+  
+}
 
 ##### This function creates subset of peak matrix by cluster cell barcode #####
 
@@ -346,7 +369,7 @@ subset_peaks_by_clus<-function(clus,merged_counts,meta)
   # If an entire cell is lost due to various filer, remove it
   rem<-which(is.na(select)==TRUE)
   if(length(rem)!=0)
-    {select<-select[-rem]}
+  {select<-select[-rem]}
   
   clus_peak<-merged_counts[,select]
   return(clus_peak)
@@ -363,22 +386,83 @@ subset_peaks_by_clus<-function(clus,merged_counts,meta)
 create_replicates<-function(clus_name,peak_mat,nrep=2,p=0.7,seed=123)
 {
   
- bc<-colnames(peak_mat)
- ncell<-length(bc)
- 
- rep<-list()
- 
- set.seed(seed)
- for(i in 1:nrep)
- {
- subset_bc<-sample(bc,(p*ncell),replace = TRUE)
- subset_mat<-peak_mat[,subset_bc]
- rep[[i]]<-rowSums(subset_mat) %>% as.data.frame()
- names(rep)[[i]]<-paste0(clus_name,'_',i)
- }
+  bc<-colnames(peak_mat)
+  ncell<-length(bc)
   
- return(rep)
+  rep<-list()
+  
+  set.seed(seed)
+  for(i in 1:nrep)
+  {
+    subset_bc<-sample(bc,(p*ncell),replace = TRUE)
+    subset_mat<-peak_mat[,subset_bc]
+    rep[[i]]<-rowSums(subset_mat) %>% as.data.frame()
+    names(rep)[[i]]<-paste0(clus_name,'_',i)
+  }
+  
+  return(rep)
 }
+
+
+##### This function prepares the final APA table #####
+
+# tab: datatable with APA results (DEXSeq,t-test, edgeR)
+# g1: group1 sample tag
+# g2: group2 sample tag
+
+get_final_APA_tab<-function(tab,g1,g2)
+{
+setnames(tab,"chr","peak_chr")
+setnames(tab,"start","peak_start")
+setnames(tab,"end","peak_end")
+setnames(tab,"strand","peak_strand")
+setnames(tab,"mean_a_norm",sprintf("mean_%s_norm",g1))
+setnames(tab,"mean_b_norm",sprintf("mean_%s_norm",g2))
+
+setnames(tab,"b_minus_a_norm",sprintf("%s_minus_%s_norm",g2,g1))
+setnames(tab,"l2_b_over_a_norm",sprintf("l2_%s_over_%s_norm",g2,g1))
+
+setnames(tab,"mean_a_frac",sprintf("mean_%s_frac",g1))
+setnames(tab,"mean_b_frac",sprintf("mean_%s_frac",g2))
+
+setnames(tab,"b_minus_a_frac",sprintf("%s_minus_%s_frac",g2,g1))
+setnames(tab,"l2_b_over_a_frac",sprintf("l2_%s_over_%s_frac",g2,g1))
+
+setnames(tab,"batchadj_padj","dex_padj")
+setnames(tab,"batchadj_delta_sig","delta_sig")
+setnames(tab,"batchadj_perfc_sig","fracfc_sig")
+setnames(tab,"int_sig","both_sig")
+
+# Remove unwanted cols
+tab[,c('dexl2fc_b_over_a','noadj_p','noadj_padj','batchadj_p','ttest_p','ttest_padj','edger_exon_p','edger_exon_padj','edger_ftest_p','edger_ftest_padj','edger_simes_p','edger_simes_padj'):=NULL]
+
+# Order
+
+cols<-colnames(tab)
+
+attrib_cols<-c('gene_name',
+               'tu',
+               'peak',
+               'peak_chr',
+               'peak_start',
+               'peak_end',
+               'peak_strand')
+
+stat_cols<-c('dex_padj',
+             'delta_sig',
+             'fracfc_sig',
+             'both_sig')
+
+rem_cols<-cols[!(cols %in% c(attrib_cols,stat_cols))]
+  
+  
+setcolorder(tab,c(attrib_cols,rem_cols,stat_cols))
+
+return(tab)
+
+}
+
+
 
 
 ##### This function creates replicates of two given cluster and performs APA testing using DEXSeq wrapped in bulk APA analysis strategy published by our lab #####
@@ -387,9 +471,6 @@ create_replicates<-function(clus_name,peak_mat,nrep=2,p=0.7,seed=123)
 # meta: meta data dataframe
 # c1 & c2: seurat clusters identity for 1st and 2nd clusters
 # c1_nm & c2_nm: cluster names (this should match their names in sample sheet)
-# adjust.var: variable to adjust for in statistical testing. Default is 'batch'
-# min_peak: threshold for retaining TU with peaks greater than this number. Deafult =1 
-# outdir: dir path to save APA outputfiles to
 
 create_apa_inputs<-function(merged_counts,meta,c1,c2,c1_nm,c2_nm)
 {
@@ -421,31 +502,4 @@ create_apa_inputs<-function(merged_counts,meta,c1,c2,c1_nm,c2_nm)
   return(list(peak_mat,meanmat))
   
 }
-
-APA_per_2clus<-function(merged_counts,meta,c1,c2,c1_nm,c2_nm,adjust.var='batch',min_peak=1,outdir)
-{
-
-  
-# Run without batch correction
-ta <- testApa2(stab=stab,meanmat=meanmat,peak_ref=peak_ref,peak_mat=peak_mat,jtu=jtu,a=a,b=b,adjust.var=NULL,ncpu=ncpu,min_peak=min_peak)
-  
-# Run with batch correction
-taadj <- testApa2(stab=stab,meanmat=meanmat,peak_ref=peak_ref,peak_mat=peak_mat,jtu=jtu,a=a,b=b,adjust.var=adjust.var,ncpu=ncpu,min_peak=min_peak)
-
-taadj$res$noadj_p <- ta$res$p
-taadj$res$noadj_padj <- ta$res$padj
-x$taadj$res$noadj_sig <- x$ta$res$sig
-
-taadj$res$batchadj_p <- taadj$res$p
-taadj$res$batchadj_padj <- taadj$res$padj
-x$ta$res$batchadj_sig <- x$taadj$res$sig
-
-taadj$res[,p:=NULL]
-taadj$res[,padj:=NULL]
-
-output_file<-paste0(outdir,'apa_',c1_nm,'_',c2_nm,'.rd')
-save(taadj,compress=T,file=output_file)
-
-}
-
 
