@@ -270,9 +270,9 @@ testTTest <- function(myta,nrepa,nrepb)
 # myta: apa object with DEXSeq and t-test results
   
 # Run function
-testEdgeR <- function(myta)
+testEdgeR <- function(myta,a,b)
 {
-  mycomp<-paste0(unique(myta$stab.sub$group)[1],"_vs_",unique(myta$stab.sub$group)[2])
+  mycomp<-paste0(a,"_vs_",b)
   message("Testing: ",mycomp)
   
   res <- myta$res
@@ -521,8 +521,5 @@ create_apa_inputs<-function(merged_counts,meta,c1,c2,c1_nm,c2_nm,out,plot_corr=F
   return(list(peak_mat,meanmat))
   
 }
-
-
-
 
 
