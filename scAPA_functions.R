@@ -100,6 +100,7 @@ testAPA2<-function(stab,peak_mat,meanmat,peak_ref,a=a,b=b,adjust.var=NULL,min_pe
   peak_gr<-makeGRangesFromDataFrame(peak,keep.extra.columns = TRUE)
   
   stopifnot(peak_gr$peak==join.keep$peak)
+  sd$group <- factor(sd$group,levels=c(a,b))
   rownames(cd) <- NULL
   
   sd.use <- data.frame(group=sd$group)
@@ -134,6 +135,7 @@ testAPA2<-function(stab,peak_mat,meanmat,peak_ref,a=a,b=b,adjust.var=NULL,min_pe
   
   if(is.null(adjust.var))
   {
+    message("Tesing w/o adjustment")
     dxd<-testForDEU(dxd)
   }else
   {
@@ -223,9 +225,9 @@ testAPA2<-function(stab,peak_mat,meanmat,peak_ref,a=a,b=b,adjust.var=NULL,min_pe
   #write.xlsx(use.frac,paste0(outdir,'Frac_usage_w_adj.xlsx'))
   
   # Return
-  res<-list(dxd=dxd,dxr=dxr,res=res,counts.raw=cd,counts.norm=counts.norm,use.frac=use.frac,a=a,b=b,stab.sub=sd)
+  ret<-list(dxd=dxd,dxr=dxr,res=res,counts.raw=cd,counts.norm=counts.norm,use.frac=use.frac,a=a,b=b,stab.sub=sd)
   
-  return(res)
+  return(ret)
 }
 
 
@@ -472,7 +474,7 @@ return(tab)
 # c1 & c2: seurat clusters identity for 1st and 2nd clusters
 # c1_nm & c2_nm: cluster names (this should match their names in sample sheet)
 
-create_apa_inputs<-function(merged_counts,meta,c1,c2,c1_nm,c2_nm)
+create_apa_inputs<-function(merged_counts,meta,c1,c2,c1_nm,c2_nm,out,plot_corr=FALSE)
 {
   
   # Create subset peak matrix for each cluster
@@ -488,18 +490,36 @@ create_apa_inputs<-function(merged_counts,meta,c1,c2,c1_nm,c2_nm)
   c2_mat<-do.call(cbind,c2_rep_lst)
   colnames(c2_mat)<-names(c2_rep_lst)
   
-  # Merge #
-  peak_mat<-cbind(c1_mat,c2_mat) # same as mat
   
+  # Merge #
+  peak_mat<-cbind(c2_mat,c1_mat) # same as mat
+  
+  # Correlation
+  cor_mat<-cor(peak_mat)
+  
+  if(plot_corr==TRUE)
+  {
+    
+    png(paste0(out,c1_nm,'_',c2_nm,'_correlation.png'),
+        width = 8,height=8, units="in",res = 300)
+    
+    corrplot.mixed(corr = cor_mat,upper = 'pie',
+                          lower='number',order='hclust',
+                          tl.pos = "lt", tl.col = "black",
+                          tl.offset=1, tl.srt = 0)
+    
+    dev.off()
+  }  
   # Now get mean matrix by calculating mean for each sample #
   
   c1_mean<-apply(X =c1_mat,1,mean)
   c2_mean<-apply(X=c2_mat,1,mean)
   
-  meanmat<-cbind(c1_mean,c2_mean) 
-  colnames(meanmat)<-c(c1_nm,c2_nm)
+  meanmat<-cbind(c2_mean,c1_mean) 
+  colnames(meanmat)<-c(c2_nm,c1_nm)
   
   return(list(peak_mat,meanmat))
   
 }
+
 
