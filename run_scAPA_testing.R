@@ -15,6 +15,7 @@ library(BSgenome.Hsapiens.UCSC.hg19)
 library(BSgenome.Hsapiens.UCSC.hg38)
 library(edgeR)
 library(DEXSeq)
+library(corrplot)
 
 source('/home/sonas/scripts/final_scripts/scAPA_functions.R')
 
@@ -93,7 +94,7 @@ for(i in 1:nrow(comps))
 c1<-as.numeric(gsub(".*?([0-9]+).*", "\\1", a[i]))
 c2<-as.numeric(gsub(".*?([0-9]+).*", "\\1", b[i]))
 
-clus_lst<-create_apa_inputs(merged_counts,meta,c1=c1,c2=c2,c1_nm=a[i],c2_nm=b[i])
+clus_lst<-create_apa_inputs(merged_counts,meta,c1=c1,c2=c2,c1_nm=a[i],c2_nm=b[i],out=outdir,plot_corr = TRUE)
 peak_mat_lst[[i]]<-clus_lst[[1]]
 meanmat_lst[[i]]<-clus_lst[[2]]
 
@@ -197,3 +198,6 @@ write.xlsx(tab_lst,paste0(outdir,'Differential_usage_w_sig_',compnames[i],'.xlsx
 
 
 }
+
+
+
