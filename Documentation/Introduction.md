@@ -10,6 +10,7 @@
 #### Step 1(a) (optional): Subset BAM
 * This is an optional step that requires cell barcodes to create a subset BAM file containing reads from only the specified cells
 * This is useful when the user wants to perform use scPolyA or APA analysis for a subset (e.g. epithelial subset)
+* script: `1_preprocessing_bam_files_ureter.sh`
 
 #### Step 1(b): Deduplication
 * Cellranger outputs BAM which still contains PCR duplicates and the pipeline removes them using UMI tools (add link)
