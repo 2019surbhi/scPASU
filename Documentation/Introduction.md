@@ -10,41 +10,34 @@
 #### Step 1(a) (optional): Subset BAM
 * This is an optional step that requires cell barcodes to create a subset BAM file containing reads from only the specified cells
 * This is useful when the user wants to perform use scPolyA or APA analysis for a subset (e.g. epithelial subset)
-* script: `1_preprocessing_bam_files_ureter.sh`
 
 #### Step 1(b): Deduplication
 * Cellranger outputs BAM which still contains PCR duplicates and the pipeline removes them using UMI tools (add link)
-* script: `1_preprocessing_bam_files_ureter.sh`
+
 
 #### Step 1(c): Filter BAM ##
 * oligo dT priming methodss can lead to internal priming events and such reads need to be removed
 * This pipeline uses polyAFilter (add github link) to remove these
 * Users are encouraged to spend time optimizing parameters for this step
-* script: `1_preprocessing_bam_files_ureter.sh`
 
 #### Step 1(d): Merge all BAM ##  
 * Each operation upto this point was performed on per sample BAM files 
 * All BAM files for the given dataset are merged 
-* script: `merge_ureter.sh`
 
 #### Step 1(e): Split by strand ##  
 * For downstream processes, the merged BAM is split by strand using samtools (add link)
-* script: `merge_ureter.sh`
-*
+
 ### Step 2: Find peaks and polyA reads
 
 #### Step 2(a): Find Peaks
 * MACS2 is used to find peaks
-* script: `macs2_ureter.sh`
 
 #### Step 2(b): Find polya reads 
 * A custom script (add link) from Github is used to find polyA tail containing reads
-* script: `samToPolyA.pl` and `sam_to_polyA_ureter_slurm.sh`
 
 ### Step 3: Intersect peaks with polyA reads 
 * Using bedtools (add link), peaks are intersected with polyA reads
 * Only those peaks supported by min 3 polyA reads are retained
-* script: `1_create_peak_ref.sh` and `1_peak_ref_slurm.sb`
 
 ### Step4: Create final peak reference 
 
@@ -56,7 +49,6 @@
 #### Step 4(b): Clean up peak reference ##
 * Remove peaks assigned to >1 TUs
 * Filter peaks supported by <3 polya reads
-* scripts: `4a_create_final_peak_ref.R`, `4b_create_saf.R` and `4_final_peak_ref_slurm.sb`
 
 
 ## II. Generate Peak by Cell Matrix #####
