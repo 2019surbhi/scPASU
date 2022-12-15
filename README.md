@@ -4,5 +4,5 @@
 
 
 
-![scPASU pipelinel](https://github.com/2019surbhi/scPASU/raw/main/scPASU_pipeline.pdf)
+![scPASU pipelinel](scPASU_pipeline.pdf)
 
