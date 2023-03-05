@@ -86,8 +86,8 @@ save(red_ens,file=genes_file)
 
 ## Peaks file ##
 
-peaks_dir_m=paste0(peaks_dir,'minus/final_filtered_ref_table/')
-peaks_dir_p=paste0(peaks_dir,'plus/final_filtered_ref_table/')
+peaks_dir_m=paste0(peaks_dir,'minus/filtered_ref_table/')
+peaks_dir_p=paste0(peaks_dir,'plus/filtered_ref_table/')
 
 files_m<-list.files(peaks_dir_m,full.names = TRUE)
 selected<-files_m[grep('chr',files_m)]
