@@ -52,8 +52,8 @@ pr_dir=${outdir}pr_dir/
 pr_table_dir=${outdir}pr_table_dir/
 peaks_count_dir=${outdir}peaks_count_dir/
 polya_count_dir=${outdir}polya_count_dir/
-final_ref_table=${outdir}final_ref_table/
-final_filtered_ref_table=${outdir}final_filtered_ref_table/
+ref_table=${outdir}ref_table/
+filtered_ref_table=${outdir}filtered_ref_table/
 
 ### 0. Prepare files ###
 
@@ -68,8 +68,8 @@ mkdir ${pr_dir}
 mkdir ${pr_table_dir}
 mkdir ${peaks_count_dir}
 mkdir ${polya_count_dir}
-mkdir ${final_ref_table}
-mkdir ${final_filtered_ref_table}
+mkdir ${ref_table}
+mkdir ${filtered_ref_table}
  
 
 # Create chr file (currently doing it manually to exclude non standard chr)
@@ -164,11 +164,11 @@ cat ${pr_dir}pr_${chr}_${strand}.bed | sort -k2,2n -k3,3n > ${pr_dir}pr_${chr}_s
 
 ### 5. Final PR table ###
 
-Rscript ${script_dir}1a_final_ref_table.R ${outdir} ${strand} ${chr}
+Rscript ${script_dir}1a_create_peak_ref.R ${outdir} ${strand} ${chr}
 
 # Filter peaks by min polya reads
 
-bed_file=${final_ref_table}ref_table_updated_${chr}_${strand}.bed
+bed_file=${ref_table}ref_table_updated_${chr}_${strand}.bed
 
-Rscript ${script_dir}1b_filter_final_ref_table.R ${bed_file} ${final_filtered_ref_table} ${min_polya}
+Rscript ${script_dir}1b_filter_peak_ref.R ${bed_file} ${filtered_ref_table} ${min_polya}
 
