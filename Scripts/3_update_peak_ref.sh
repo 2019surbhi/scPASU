@@ -17,11 +17,11 @@ module load R/4.1.0
 ### Initialize variables ###
 
 extn=25
-extn=50
-extn=75
-extn=100
-extn=125
-extn=149
+#extn=50
+#extn=75
+#extn=100
+#extn=125
+#extn=149
 
 
 outdir='/home/sonas/beegfs/APA/scPASU/output/2_PeakRef/2d_TU_annotated/'
