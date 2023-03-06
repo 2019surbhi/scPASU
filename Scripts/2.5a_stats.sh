@@ -40,6 +40,7 @@ cd ${dir}
 mkdir stats
 
 stats=${dir}stats/
+outdir='/home/sonas/beegfs/APA/scPASU/output/2.5_PeakRefAssessment/stats/'
 
 # Get summary count for all intermediate steps
 
@@ -100,7 +101,7 @@ printf "%s\t%s\n" ${count} ${files}  >> ${stats}min_polya_reads_supporting_peaks
 done
 
 
-Rscript ${script_dir}combine_stats.R ${stats} ${strand}
+Rscript ${script_dir}2.5b_combine_stats.R ${stats} ${outdir} ${strand}
 
 
 
