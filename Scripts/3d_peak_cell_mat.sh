@@ -39,7 +39,7 @@ bam=${bam_dir}dedup_${sample}_uro_filtered_l300iA10mm3.bam
 
 #peak_ref_dir='/home/sonas/beegfs/APA/scAPA/ureter10/peak_mat/final_ref/'
 #peak_ref_dir='/home/sonas/beegfs/APA/scAPA/ureter10/rerun/peak_universe_w_extn/final_ref/'
-peak_ref_dir='/home/sonas/beegfs/APA/scPASU/output/2_PeakRef/2e_TSS_filtered/'
+peak_ref_dir='/home/sonas/beegfs/APA/scPASU/output/3_PeakCounts/'
 
 #peak_ref=${peak_ref_dir}u10_uro_BAMfiltered_peak_universe.saf
 #peak_ref=${peak_ref_dir}u10_uro_final_peak_ref_3polya_updated.saf
@@ -48,14 +48,14 @@ peak_ref_dir='/home/sonas/beegfs/APA/scPASU/output/2_PeakRef/2e_TSS_filtered/'
 #peak_ref=${peak_ref_dir}u10_uro_final_peak_ref_l300i_A10mm3_3polya_updated.saf
 #peak_ref=${peak_ref_dir}u10_uro_w_extn100_updated.saf
 #peak_ref=${peak_ref_dir}u10_uro_w_extn100_updated_tss_filt.saf
-peak_ref=${peak_ref_dir}u10_uro_l300iA10mm3_e100_updated_tss_filt.txt
+peak_ref=${peak_ref_dir}u10_uro_l300iA10mm3_e100_updated.saf
 
 # PEAK MAT DIR #
 
 #peak_mat_dir='/home/sonas/beegfs/APA/scAPA/ureter10/peak_mat/l300iA10mm3/'
 #peak_mat_dir1='/home/sonas/beegfs/APA/scAPA/ureter10/rerun/peak_mat/l300iA10mm3_extn100/'
 #peak_mat_dir='/home/sonas/beegfs/APA/scAPA/ureter10/rerun/peak_mat/l300iA10mm3_extn100_tss_filt/'
-peak_mat_dir='/home/sonas/beegfs/APA/scPASU/output/3_PeakCounts/3c_CreatePeakMat/'
+peak_mat_dir='/home/sonas/beegfs/APA/scPASU/output/3_PeakCounts/'
 
 ### 2. Split barcode per cell ###
 
@@ -68,7 +68,7 @@ peak_mat_dir='/home/sonas/beegfs/APA/scPASU/output/3_PeakCounts/3c_CreatePeakMat
 #mkdir ${peak_mat_dir}split_bam/${sample}
 
 subset_bam_dir=${peak_mat_dir}3b_SplitBAM/${sample}/
-bc_dir=${peak_mat_dir}3a_SplitBarcodes/${sample}/
+#bc_dir=${peak_mat_dir}3a_SplitBarcodes/${sample}/
 
 #cd ${bc_dir}
 #bc=*.tsv
