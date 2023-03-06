@@ -23,8 +23,9 @@ extn=25
 #extn=125
 #extn=149
 
-script_dir='/home/sonas/beegfs/APA/scPASU/scripts/'
+fprefix=u10_uro_l300iA10mm3_e${extn}
 
+script_dir='/home/sonas/beegfs/APA/scPASU/scripts/'
 dir='/home/sonas/beegfs/APA/scPASU/output/2_PeakRef/2c_intersect/e'${extn}/${strand}/
 
 peaks_dir=${dir}peaks_dir/
@@ -101,7 +102,7 @@ printf "%s\t%s\n" ${count} ${files}  >> ${stats}min_polya_reads_supporting_peaks
 done
 
 
-Rscript ${script_dir}2.5b_combine_stats.R ${stats} ${outdir} ${strand}
+Rscript ${script_dir}2.5_combine_stats.R ${stats} ${outdir} ${strand}
 
 
 
