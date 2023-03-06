@@ -13,3 +13,13 @@
 ### Load modules ###
 
 module load R/4.1.0
+
+ref_file_path=args[1]
+out=args[2]
+prefix=args[3]
+
+ref_file='/home/sonas/beegfs/APA/scPASU/output/2_PeakRef/2e_TSS_filtered/u10_uro_l300iA10mm3_e100_updated_tss_filt.txt'
+out='/home/sonas/beegfs/APA/scPASU/output/3_PeakCounts/'
+prefix='u10_uro_l300iA10mm3_e100'
+
+Rscript ${script_dir}2d_create.saf.R ${ref_file} ${out} ${prefix}
