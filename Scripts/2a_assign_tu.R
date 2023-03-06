@@ -70,7 +70,7 @@ bio.want <- tab[tab$group %in% c("Protein_coding","Long_noncoding"),]$Var1
 g<-rtracklayer::import(gtf_file)
 gtf=as.data.frame(g)
 
-gtf<-gtf[!duplicated(gtf$gene_name),]
+gtf<-gtf[!duplicated(gtf$gene_id),]
 genes<-genes[genes$gene.id %in% gtf$gene_name,]
 
 # Get gene type name from gtf
