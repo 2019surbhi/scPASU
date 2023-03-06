@@ -3,7 +3,8 @@
 args<-commandArgs(trailing=TRUE)
 stats_dir=args[1]
 outdir=args[2]
-strand=args[3]
+fprefix=args[3]
+strand=args[4]
 
 library(data.table)
 library(dplyr)
@@ -60,4 +61,4 @@ colnames(stats)<-c('total_peaks','polya_peaks','non_polya_peaks','min_polya_peak
 stats<-cbind(chr,stats)
 
 # Save
-write.csv(stats,paste0(outdir,strand,'_stats.csv'))
+write.csv(stats,paste0(outdir,fprefix,'_',strand,'_stats.csv'))
