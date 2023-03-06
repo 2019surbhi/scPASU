@@ -10,6 +10,10 @@ library(matrixStats)
 library(edgeR)
 library(DEXSeq)
 library(GenomicRanges)
+library(handy)
+library(goldmine)
+library(rtracklayer)
+library(dplyr)
 
 
 ### This function creates TUs ###
