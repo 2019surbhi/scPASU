@@ -596,11 +596,11 @@ if(norm=='')
  
 if(length(features)<=1)
    {if(features=='')
-  {
+    {
    # Select features
    features<-SelectIntegrationFeatures(obj.list,nfeatures=anchors)
+    }
   }
-
 # Find Integration anchors
 sample.anchors<-FindIntegrationAnchors(s.obj.list,dims = 1:30,k.filter=mink,reduction='cca',anchor.features=features,normalization.method=norm)
 
