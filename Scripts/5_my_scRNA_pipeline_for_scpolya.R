@@ -271,7 +271,7 @@ cat('Processing HVG list argument')
 if(args$var_genes_file!='none')
 	{tab<-read.table(args$var_genes_file,header=FALSE)
 	 var_features<-tab$V1
-	}else{var_featues<-'none'}
+	}else{var_features<-'none'}
 
 #Process PCA components
 
