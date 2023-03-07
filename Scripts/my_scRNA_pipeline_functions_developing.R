@@ -594,11 +594,13 @@ if(norm=='')
 #Determine min number of neighbors
  mink<-min(200, min(sapply(seq_along(s.obj.list),function(x) ncol(s.obj.list[[x]]) ))  )
  
-if(features=='')
-{
-# Select features
-features<-SelectIntegrationFeatures(obj.list,nfeatures=anchors)
-}
+if(length(features)<=1)
+   {if(features=='')
+  {
+   # Select features
+   features<-SelectIntegrationFeatures(obj.list,nfeatures=anchors)
+  }
+
 # Find Integration anchors
 sample.anchors<-FindIntegrationAnchors(s.obj.list,dims = 1:30,k.filter=mink,reduction='cca',anchor.features=features,normalization.method=norm)
 
