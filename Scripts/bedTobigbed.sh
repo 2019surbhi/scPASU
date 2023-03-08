@@ -23,12 +23,23 @@ ref_dir='/home/sonas/beegfs/ref/refdata-gex-GRCh38-2020-A/fasta/'
 #bed_prefix='u10_uro_p1_unfiltered_3polya'
 
 #dir='/home/sonas/beegfs/APA/scAPA/ureter10/rerun/peak_universe_w_extn/final_ref/'
-dir='/home/sonas/beegfs/APA/scPASU/output/3_RefinePeakRef/3b_TSS_filtered/'
+#dir='/home/sonas/beegfs/APA/scPASU/output/3_RefinePeakRef/3b_TSS_filtered/'
 
-bed='u10_uro_w_extn100_updated_tss_filt.bed'
-bed_prefix='u10_uro_w_extn100_updated_tss_filt'outdir='/home/sonas/beegfs/APA/scPASU/output/7_UCSC_uploads/bigbed/'
+#dir='/home/sonas/beegfs/APA/scPASU/output/2_PeakRef/2e_TSS_filtered/'
+#bed='u10_uro_l300iA10mm3_e100_tss_filt.bed'
+#bed_prefix='u10_uro_l300iA10mm3_e100_tss_filt'
 
-# Use R to read the text file, subset relevant columns ()  and then save it using write.table() with sep='\t and quote=FALSE #
+dir='/home/sonas/beegfs/APA/scPASU/input/'
+bed='pdb_hg38.bed'
+bed_prefix='pdb_hg38'
+
+
+
+outdir='/home/sonas/beegfs/APA/scPASU/output/7_UCSC_uploads/bigbed/'
+
+# Use R to read the text file, subset relevant columns and then save it using write.table() with sep='\t', col.names=FALSE,row.names=FALSE and quote=FALSE #
+# col saved and ordered: chr,start,end,final_annotation, score, strand
+
 
 cd ${dir}
 
