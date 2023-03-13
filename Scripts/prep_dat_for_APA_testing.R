@@ -1,4 +1,12 @@
 
+
+#### (1) Using cluster level peak counts ####
+
+
+
+
+#### (2) Using Seurat obj #######
+
 # Read Seurat object - using ureter paper's annotation
 obj<-readRDS('/home/sonas/tingalab/Manuscripts/2021_UreterManuscript/ANALYSIS/Seurat/Uro subset/2021_04_01_ureter10_uro_PC50_res0.2/2021_04_01_ureter10_uro_PC50_res0.2_clustered.rds')
 
