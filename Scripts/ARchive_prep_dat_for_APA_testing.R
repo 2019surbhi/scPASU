@@ -1,10 +1,5 @@
 
 
-#### (1) Using cluster level peak counts ####
-
-
-
-
 #### (2) Using Seurat obj #######
 
 # Read Seurat object - using ureter paper's annotation
