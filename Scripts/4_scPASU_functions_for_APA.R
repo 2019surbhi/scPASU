@@ -499,7 +499,7 @@ get_final_APA_tab<-function(tab,g1,g2)
   setnames(tab,"int_sig","both_sig")
   
   # Remove unwanted cols
-  tab[,c('dexl2fc_b_over_a','ttest_p','ttest_padj','edger_exon_p','edger_exon_padj','edger_ftest_p','edger_ftest_padj','edger_simes_p','edger_simes_padj'):=NULL]
+  tab[,c('dexl2fc_b_over_a','p','ttest_p','ttest_padj','edger_exon_p','edger_exon_padj','edger_ftest_p','edger_ftest_padj','edger_simes_p','edger_simes_padj'):=NULL]
   
   # Order
   
@@ -520,13 +520,25 @@ get_final_APA_tab<-function(tab,g1,g2)
   
   rem_cols<-cols[!(cols %in% c(attrib_cols,stat_cols))]
   
-  
+  rem_cols1<-c(sprintf("%s_1_norm",g1),
+               sprintf("%s_2_norm",g1),
+               sprintf("%s_1_norm",g2),
+               sprintf("%s_2_norm",g2),
+               sprintf("mean_%s_norm",g1),
+               sprintf("mean_%s_norm",g2),
+               sprintf("%s_1_frac",g1),
+               sprintf("%s_2_frac",g1),
+               sprintf("%s_1_frac",g2),
+               sprintf("%s_2_frac",g2),
+               sprintf("mean_%s_frac",g1),
+               sprintf("mean_%s_frac",g2))
+  rem_cols2<-rem_cols[!(rem_cols %in% rem_cols1)]
+  rem_cols<-c(rem_cols1,rem_cols2)
   setcolorder(tab,c(attrib_cols,rem_cols,stat_cols))
   
   return(tab)
   
 }
-
 
 
 #### Archive #######
