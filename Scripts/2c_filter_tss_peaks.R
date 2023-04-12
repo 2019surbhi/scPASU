@@ -159,6 +159,16 @@ filt_ref_pn2<-rbind(filt_ref_pn_p2,filt_ref_pn_m2)
 
 final_ref<-rbind(filt_ref_p0,filt_ref_pn2)
 
+
+# Correct minus strand annotation
+
+start<-ifelse(final_ref$strand=='+',final_ref$start,final_ref$end)
+end<-ifelse(final_ref$strand=='+',final_ref$end,final_ref$start)
+
+final_ref$start<-start
+final_ref$end<-end
+
+
 write.table(final_ref,paste0(out,fprefix,'_updated_tss_filt_final.txt'),sep='\t',row.names=FALSE)
 
 
