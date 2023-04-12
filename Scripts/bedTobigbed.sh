@@ -29,10 +29,13 @@ ref_dir='/home/sonas/beegfs/ref/refdata-gex-GRCh38-2020-A/fasta/'
 #bed='u10_uro_l300iA10mm3_e100_tss_filt.bed'
 #bed_prefix='u10_uro_l300iA10mm3_e100_tss_filt'
 
-dir='/home/sonas/beegfs/APA/scPASU/input/'
-bed='pdb_hg38.bed'
-bed_prefix='pdb_hg38'
+#dir='/home/sonas/beegfs/APA/scPASU/input/'
+#bed='pdb_hg38.bed'
+#bed_prefix='pdb_hg38'
 
+dir='/home/sonas/beegfs/APA/scPASU/output/2_PeakRef/2e_TSS_filtered/'
+bed='u10_uro_l300iA10mm3_e100_updated_tss_filt_final.bed'
+bed_prefix='u10_uro_l300iA10mm3_e100_updated_tss_filt_final'
 
 
 outdir='/home/sonas/beegfs/APA/scPASU/output/7_UCSC_uploads/bigbed/'
