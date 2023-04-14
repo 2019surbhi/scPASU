@@ -4,4 +4,4 @@
 
 
 
-![scPASU pipelinel](https://github.com/2019surbhi/scPASU/blob/main/pipeline.png?raw=true)
+![scPASU pipelinel](https://github.com/2019surbhi/scPASU/blob/main/scPASU_pipeline.png?raw=true)
