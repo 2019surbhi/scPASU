@@ -10,7 +10,7 @@ out=args[2]
 prefix=args[3]
 
 # Read ref file #
-ref_file<-read.table(ref_file_path,header=TRUE)
+ref_file<-fread(ref_file_path) %>% as.data.frame()
 
 # Select relevant columns
 cols<-c('final_annotation','chr','start','end','strand')
