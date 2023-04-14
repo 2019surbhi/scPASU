@@ -56,6 +56,6 @@ sort -k 1,1 -k2,2n ${dir}${bed_prefix}_plus.bed > ${dir}${bed_prefix}_plus_sorte
 
 
 # Convert to bigBed
-bedToBigBed ${dir}${bed_prefix}_minus_sorted.bed ${ref_dir}chr.sizes ${outdir}${bed_prefix}_minus_sorted.bb
-bedToBigBed ${dir}${bed_prefix}_plus_sorted.bed  ${ref_dir}chr.sizes ${outdir}${bed_prefix}_plus_sorted.bb
+bedToBigBed ${dir}${bed_prefix}_minus_sorted.bed ${ref_dir}chr.sizes ${outdir}${bed_prefix}_minus.bb
+bedToBigBed ${dir}${bed_prefix}_plus_sorted.bed  ${ref_dir}chr.sizes ${outdir}${bed_prefix}_plus.bb
 
