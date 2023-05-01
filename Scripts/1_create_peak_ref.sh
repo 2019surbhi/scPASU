@@ -123,16 +123,21 @@ cat ${int_dir}peaks_int_polya_${chr}_${strand}.bed | sort -k6,6n  > ${int_dir}pe
 
 awk  'FS=OFS="\t" {if($6==".") {$12="non_polya"} else {$12="polya"}; {print $0}}' ${int_dir}peaks_int_polya_${chr}_sorted_${strand}.bed > ${int_dir}peaks_int_polya_${chr}_tagged_${strand}.bed
 
+##Clean up ambiguous rows 
+file=${int_dir}peaks_int_polya_${chr}_tagged_${strand}.bed
+fname=peaks_int_polya_${chr}_tagged_filtered_${strand}.bed
+Rscript ${script_dir}cleanup_peak_ref.R ${file} ${int_dir} 
+
 ### 2b. Sort by polya column
 
-cat ${int_dir}peaks_int_polya_${chr}_tagged_${strand}.bed | sort -k12,12 > ${int_dir}peaks_int_polya_${chr}_tagged_sorted_${strand}.bed
+cat ${int_dir}peaks_int_polya_${chr}_tagged_filtered_${strand}.bed | sort -k12,12 > ${int_dir}peaks_int_polya_${chr}_tagged_sorted_${strand}.bed
 
 ### 3a. Create peaks count
-cat ${int_dir}peaks_int_polya_${chr}_tagged_${strand}.bed | grep -w polya | awk 'FS=OFS="\t" {print $4}' | sort | uniq -c | sort -k1,1n > ${peaks_count_dir}peaks_${chr}_count_sorted_${strand}.txt
+cat ${int_dir}peaks_int_polya_${chr}_tagged_filtered_${strand}.bed | grep -w polya | awk 'FS=OFS="\t" {print $4}' | sort | uniq -c | sort -k1,1n > ${peaks_count_dir}peaks_${chr}_count_sorted_${strand}.txt
 
 ### 3.b. Create polya read count per peak
 cd ${int_dir}
-file=${int_dir}peaks_int_polya_${chr}_tagged_${strand}.bed
+file=${int_dir}peaks_int_polya_${chr}_tagged_filtered_${strand}.bed
 peaks_file=${peaks_count_dir}peaks_${chr}_count_sorted_${strand}.txt
 peaks=$(cat ${peaks_file} | awk '{print $2}')
 
