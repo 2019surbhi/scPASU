@@ -43,8 +43,8 @@ samtools index ${dedup_dir}dedup_${sample}_uro.bam
 
 ## 3. Cleanup BAM - only uniquely mapped reads retained ##
 
-#samtools view -b -q 1 ${dedup_dir}dedup_${sample}_uro.bam > ${clean_bam_dir}dedup_uniq_${sample}_uro.bam
-#samtools index ${clean_bam_dir}dedup_uniq_${sample}_uro.bam
+samtools view -b -q 1 ${dedup_dir}dedup_${sample}_uro.bam > ${clean_bam_dir}dedup_uniq_${sample}_uro.bam
+samtools index ${clean_bam_dir}dedup_uniq_${sample}_uro.bam
 
 ## 4. Filter genomicA reads ##
 
@@ -63,7 +63,7 @@ NTHREADS=20
 #SCRIPT
 cd $WORKING_DIR
 
-# Create the GTF database
+# Create the GTF database - Run the script 1a_prepare_gtf_db.sh first!
 python polyAfilter.py createDB -v $GTF $DB
 
 # Create the TRANS file
