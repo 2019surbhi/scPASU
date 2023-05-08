@@ -9,11 +9,11 @@ strand=args[2]
 chr=args[3]
 min_polya=as.numeric(args[4])
 
-out<-paste0(dir,'peak_ref_table/')
-out2<-paste0(dir,'final_peak_ref/')
-prdir<-paste0(dir,'pr_dir/')
-peak_ref_dir<-paste0(dir,'/peak_ref_table/')
+prdir<-paste0(dir,'3b_pr_dir/')
+peak_ref_dir<-paste0(dir,'/3a_peak_ref_table/')
 count_dir<-paste0(dir,'peaks_count_dir/')
+out<-peak_ref_dir
+out2<-paste0(dir,'4_polya_supported_peak_ref/')
 
 pr_file<-paste0(prdir,'pr_',chr,'_sorted_',strand,'.bed')
 peak_ref_file<-paste0(peak_ref_dir,'peak_ref_',chr,'_',strand,'.bed')
