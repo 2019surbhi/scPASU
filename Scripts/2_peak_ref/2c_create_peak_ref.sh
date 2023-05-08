@@ -50,7 +50,7 @@ polya_per_chr=${outdir}0_polya_per_chr/
 int_dir=${outdir}1_int_dir/
 peaks_count_dir=${outdir}2a_peaks_count_dir/
 polya_count_dir=${outdir}2b_polya_count_dir/
-peak_ref_dir=${outdir}3a_peak_ref_table/
+peak_ref_table=${outdir}3a_peak_ref_table/
 pr_dir=${outdir}3b_pr_dir/
 final_peak_ref=${outdir}4_final_peak_ref/
 
@@ -67,9 +67,7 @@ mkdir ${peaks_count_dir}
 mkdir ${polya_count_dir}
 mkdir ${pr_dir}
 mkdir ${peak_ref_table}
-
-mkdir ${ref_table}
-mkdir ${filtered_ref_table}
+mkdir ${final_peak_ref}
  
 
 # Create chr file (currently doing it manually to exclude non standard chr)
