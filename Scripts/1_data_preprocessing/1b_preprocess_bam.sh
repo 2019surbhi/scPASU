@@ -70,7 +70,8 @@ python polyAfilter.py createDB -v $GTF $DB
 python polyAfilter.py createTRANS $DB $BAM $TRANS
 
 # Filter the BAM file
-python polyAfilter.py BAMfilter -m 1 -v -p $NTHREADS 300 10 $BAM $FASTA $TRANS -o ${filter_dir}dedup_${sample}_uro_filtered.bam
-
+#python polyAfilter.py BAMfilter -m 3 -i -v -p $NTHREADS 300 10 $BAM $FASTA $TRANS -o ${filter_dir}dedup_${sample}_uro_filtered.bam
 samtools index ${filter_dir}dedup_${sample}_uro_filtered.bam
+
+
 
