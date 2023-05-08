@@ -169,11 +169,11 @@ cat ${pr_dir}pr_${chr}_${strand}.bed | sort -k2,2n -k3,3n > ${pr_dir}pr_${chr}_s
 
 ### 5. Final PR table ###
 
-Rscript ${script_dir}1a_create_peak_ref.R ${outdir} ${strand} ${chr}
+Rscript ${script_dir}2c_create_peak_ref.R ${outdir} ${strand} ${chr}
 
 # Filter peaks by min polya reads
 
 bed_file=${ref_table}ref_table_updated_${chr}_${strand}.bed
 
-Rscript ${script_dir}1b_filter_peak_ref.R ${bed_file} ${filtered_ref_table} ${min_polya}
+Rscript ${script_dir}2c_filter_peak_ref.R ${bed_file} ${filtered_ref_table} ${min_polya}
 
