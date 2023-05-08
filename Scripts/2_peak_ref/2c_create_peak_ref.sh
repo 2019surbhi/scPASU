@@ -60,14 +60,14 @@ final_peak_ref=${outdir}4_polya_supported_peak_ref/
 
 cd ${outdir}
 
-mkdir ${peaks_per_chr}
-mkdir ${polya_per_chr}
-mkdir ${int_dir}
-mkdir ${peaks_count_dir}
-mkdir ${polya_count_dir}
-mkdir ${pr_dir}
-mkdir ${peak_ref_table}
-mkdir ${final_peak_ref}
+mkdir -p ${peaks_per_chr}
+mkdir -p ${polya_per_chr}
+mkdir -p ${int_dir}
+mkdir -p ${peaks_count_dir}
+mkdir -p ${polya_count_dir}
+mkdir -p ${pr_dir}
+mkdir -p ${peak_ref_table}
+mkdir -p ${final_peak_ref}
  
 
 # Create chr file (currently doing it manually to exclude non standard chr)
