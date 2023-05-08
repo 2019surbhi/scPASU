@@ -20,7 +20,7 @@ out_dir='/home/sonas/beegfs/APA/scPASU/output/2_PeakRef/2a_peaks/'
 strand='plus'
 strand='minus'
 
-bam_prefix=dedup_u10_uro_clean_filter_${strand}
+bam_prefix=dedup_u10_uro_clean_filtered_${strand}
 
 # Run MACS2
 
