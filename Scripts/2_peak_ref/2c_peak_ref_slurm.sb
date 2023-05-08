@@ -105,7 +105,7 @@ out_dir=${dir}e${extn}/
 
 script_dir=${outdir}'scPASU/scripts/'
 
-bash ${script_dir}1_create_peak_ref.sh -m ${macs_dir} -p ${polya_dir} -o ${out_dir} -s ${strand} -c ${chr} -n ${min_polya} -e ${extn} -t ${script_dir}
+bash ${script_dir}2c_create_peak_ref.sh -m ${macs_dir} -p ${polya_dir} -o ${out_dir} -s ${strand} -c ${chr} -n ${min_polya} -e ${extn} -t ${script_dir}
 
 
                                                                                                                           
