@@ -124,9 +124,9 @@ cat ${int_dir}peaks_int_polya_${chr}_${strand}.bed | sort -k6,6n  > ${int_dir}pe
 awk  'FS=OFS="\t" {if($6==".") {$12="non_polya"} else {$12="polya"}; {print $0}}' ${int_dir}peaks_int_polya_${chr}_sorted_${strand}.bed > ${int_dir}peaks_int_polya_${chr}_tagged_${strand}.bed
 
 ##Clean up ambiguous rows 
-file=${int_dir}peaks_int_polya_${chr}_tagged_${strand}.bed
-fname=peaks_int_polya_${chr}_tagged_filtered_${strand}.bed
-Rscript ${script_dir}cleanup_peak_ref.R ${file} ${int_dir} 
+#file=${int_dir}peaks_int_polya_${chr}_tagged_${strand}.bed
+#fname=peaks_int_polya_${chr}_tagged_filtered_${strand}.bed
+#Rscript ${script_dir}cleanup_peak_ref.R ${file} ${int_dir} 
 
 ### 2b. Sort by polya column
 
