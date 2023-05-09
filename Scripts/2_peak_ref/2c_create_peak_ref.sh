@@ -166,11 +166,6 @@ cat ${pr_dir}pr_${chr}_${strand}.bed | sort -k2,2n -k3,3n > ${pr_dir}pr_${chr}_s
 
 ### 3d. Add inferred PR, peak & PR width and polyA count  ###
 
-Rscript ${script_dir}2c_update_peak_ref.R ${outdir} ${strand} ${chr}
+Rscript ${script_dir}2c_update_peak_ref.R ${outdir} ${strand} ${chr} ${min_polya}
 
-# Filter peaks by min polya reads
-
-#bed_file=${ref_table}ref_table_updated_${chr}_${strand}.bed
-
-#Rscript ${script_dir}2c_filter_peak_ref.R ${bed_file} ${filtered_ref_table} ${min_polya}
 
