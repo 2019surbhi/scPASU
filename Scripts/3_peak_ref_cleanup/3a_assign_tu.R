@@ -21,17 +21,21 @@ source(paste0(script_dir,'/scPASU_functions.R'))
 
 outdir<-paste0(dir,/output/2_PeakRef/2d_TU_annotated/')
 inputdir<-paste0(dir,'/input/')
+
 # HPC paths
 #dir<-'/home/sonas/beegfs/APA/scPASU/input/'
 #genedir<-'/home/sonas/beegfs/APA/scPASU/input/'
 #genedir<-'/home/sonas/beegfs/APA/scAPA/ureter10/Archive/assign_tu'
 #gtf_file<-"/home/sonas/beegfs/ref/refdata-gex-GRCh38-2020-A/genes/genes.gtf"
+
+
 ensembl_biotype_table<-paste0(inputdir,"GRCh38_gene_biotypes.csv")
-genes_file<-paste0(outdir,"/genes.rds")
+genes_file<-paste0(inputdir,"/genes.rds")
 output_file<-paste0(outdir,"/",fprefix,"_jtu.rds")
 track_dir<-paste0(outdir,"/tracks/")
 cache_dir<-paste0(outdir,"/tmp/")
 #input_file<-paste0(dir,"/bam_path.csv")
+
 chrs <- handy::chrs()
 dist <- 10
 cov <- 10
@@ -49,7 +53,7 @@ if(!dir.exists(cache_dir))
 ### Create genes table ###
 if(file.exists(genes_file))
 {
- load(genes_file)
+ genes<-readRDS(genes_file)
 }else{
 genes <- getGenes2("gencode",genome="hg38", gencodetable="wgEncodeGencodeCompV32", cachedir=cache_dir,sync=FALSE,url='https://hgdownload.soe.ucsc.edu/goldenPath/')
 
