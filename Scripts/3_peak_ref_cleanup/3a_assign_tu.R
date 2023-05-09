@@ -90,12 +90,12 @@ save(red_ens,file=genes_file)
 
 ## Peaks file ##
 
-peaks_dir_m=paste0(peaks_dir,'minus/filtered_ref_table/')
-peaks_dir_p=paste0(peaks_dir,'plus/filtered_ref_table/')
+peaks_dir_m=paste0(peaks_dir,'/minus/4_polya_supported_peak_ref/')
+peaks_dir_p=paste0(peaks_dir,'/plus/4_polya_supported_peak_ref/')
 
 files_m<-list.files(peaks_dir_m,full.names = TRUE)
 selected<-files_m[grep('chr',files_m)]
-file_lst_m<-lapply(selected,read.table,sep='\t',header=TRUE)
+file_lst_m<-lapply(selected,fread,header=TRUE)
 merged_m<-do.call(bind_rows,file_lst_m)
 
 # correct colnames (if needed)
@@ -107,7 +107,7 @@ colnames(merged_m)<-cols[c(1,3,2,4:8,10,9,11:13)]
 
 files_p<-list.files(peaks_dir_p,full.names = TRUE)
 selected<-files_p[grep('chr',files_m)]
-file_lst_p<-lapply(selected,read.table,sep='\t',header=TRUE)
+file_lst_p<-lapply(selected,fread,header=TRUE)
 merged_p<-do.call(bind_rows,file_lst_p)
 
 merged<-bind_rows(merged_m,merged_p)
