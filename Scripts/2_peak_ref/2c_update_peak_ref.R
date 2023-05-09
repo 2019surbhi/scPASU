@@ -82,4 +82,4 @@ keep<-which(peak_ref$polya_count>=min_polya)
 peak_ref2<-peak_ref[keep,]
 
 fname2<-gsub('.bed',paste0('_',min_polya,'polya.bed'),fname)
-write.table(peak_ref2,paste0(out2,fname2),sep='\t',row.names=FALSE,col.names=FALSE,quote=FALSE)
+write.table(peak_ref2,paste0(out2,fname2),sep='\t',row.names=FALSE,quote=FALSE)
