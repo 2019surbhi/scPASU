@@ -134,7 +134,7 @@ cat ${int_dir}peaks_int_polya_${chr}_tagged_${strand}.bed | grep -w polya | awk 
 
 ### 2b. Create polya read count per peak
 cd ${int_dir}
-file=${int_dir}peaks_int_polya_${chr}_tagged_filtered_${strand}.bed
+file=${int_dir}peaks_int_polya_${chr}_tagged_${strand}.bed
 peaks_file=${peaks_count_dir}peaks_${chr}_count_sorted_${strand}.txt
 peaks=$(cat ${peaks_file} | awk '{print $2}')
 
