@@ -30,7 +30,7 @@ extn=149
 dir='/home/sonas/beegfs/APA/scPASU/'
 peaks_ref_dir='/home/sonas/beegfs/APA/scPASU/output/2_PeakRef/2c_intersect/e'${extn}'/'
 file_prefix='u10_uro_l300iA10mm3_e'${extn}
-gtf_file<-'/home/sonas/beegfs/ref/refdata-gex-GRCh38-2020-A/genes/genes.gtf'
+gtf_file='/home/sonas/beegfs/ref/refdata-gex-GRCh38-2020-A/genes/genes.gtf'
 #out_dir='/home/sonas/beegfs/APA/scPASU/output/2_PeakRef/2d_TU_annotated/'
 
 
