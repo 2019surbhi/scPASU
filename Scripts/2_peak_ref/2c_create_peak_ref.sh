@@ -109,7 +109,7 @@ cat  ${polya_per_chr}polya_${chr}_${strand}.bed | sort -k2,2n -k3,3n >  ${polya_
 
 echo intersect
 
-bedtools intersect -a ${peaks_per_chr}peaks_${chr}_sorted_${strand}.bed -b ${polya_per_chr}polya_${chr}_sorted_${strand}.bed -wa -wb -loj -s > ${int_dir}peaks_int_polya_${chr}_${strand}.bed
+bedtools intersect -a ${peaks_per_chr}peaks_${chr}_sorted_${strand}.bed -b ${polya_per_chr}polya_${chr}_sorted_${strand}.bed -wa -wb -loj > ${int_dir}peaks_int_polya_${chr}_${strand}.bed
 
 
 ### 1b. Sort intersect table ###
