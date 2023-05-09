@@ -19,7 +19,7 @@ pr_file<-paste0(prdir,'pr_',chr,'_sorted_',strand,'.bed')
 peak_ref_file<-paste0(peak_ref_dir,'peak_ref_',chr,'_',strand,'.bed')
 count_file<-paste0(count_dir,'peaks_',chr,'_count_sorted_',strand,'.txt')
 
-pr<-read.table(pr_file,header=FALSE,sep="\t")
+pr<-fread(pr_file)
 if(strand=='minus')
 { colnames(pr)<-c('peakID','end','start')
  }else if(strand=='plus')
@@ -27,12 +27,12 @@ if(strand=='minus')
   colnames(pr)<-c('peakID','start','end')
 }
 
-peak_ref<-read.table(peak_ref_file,header=FALSE,sep="\t")
+peak_ref<-fread(peak_ref_file)
 
 if(strand=='minus')
-  {colnames(peak_ref<-c('peak_chr','peak_end','peak_start','peakID','peak_strand','pr_chr','polya_end','polya_start','readID','A_len','pr_strand','polya')
+  {colnames(peak_ref<-c('peak_chr','peak_end','peak_start','peakID','peak_strand','pr_chr','pr_end','pr_start','readID','A_len','pr_strand','polya')
 }else if(strand=='plus'){
-  colnames(peak_ref)<-c('peak_chr','peak_start','peak_end','peakID','peak_strand','pr_chr','polya_start','polya_end','readID','A_len','pr_strand','polya')
+  colnames(peak_ref)<-c('peak_chr','peak_start','peak_end','peakID','peak_strand','pr_chr','pr_start','pr_end','readID','A_len','pr_strand','polya')
 }else{
   cat('Error: must specify strand \n')
 }
@@ -41,7 +41,7 @@ count<-fread(count_file)
 colnames(count)<-c('count','peakID')
 
 # Remove polya coordinate columns
-peak_ref<-peak_ref[,-c(7,8,9,10)]
+peak_ref<-peak_ref[,-c(7,8,9)]
 
 peak_ref$pr_end<-0
 peak_ref$pr_start<-0
@@ -72,7 +72,7 @@ peak_ref$polya_count[indx2]<-count$count
 #final_tab<-rbind(final_tab,pr_tab)
 
 #save individual chr output
-fname<-basename(peak_ref_file) %>% gsub('peak_ref_table','peak_ref_updated',.)
+fname<-basename(peak_ref_file) %>% gsub('peak_ref','peak_ref_updated',.)
 
 write.table(peak_ref,file = paste0(out,fname),row.names = FALSE,sep = "\t")
 
