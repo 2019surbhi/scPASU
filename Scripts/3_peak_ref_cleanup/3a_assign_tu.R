@@ -216,5 +216,17 @@ merged_tu3<-rbind(single_tu,multi_tu2)
 # Save
 merged_tu3<-merged_tu3 %>% as.data.frame()
 
-write.table(merged_tu3,paste0(outdir,fprefix,'_updated.txt'),sep='\t',row.names=FALSE,col.names=TRUE)
+write.table(merged_tu3,paste0(outdir,fprefix,'_peak_universe_updated.txt'),sep='\t',row.names=FALSE,col.names=TRUE)
+
+
+# Create SAF format peak ref too
+
+# Select relevant columns
+cols<-c('final_annotation','chr','start','end','strand')
+select<-match(cols,colnames(merged_tu3))
+saf_ref<-merged_tu3[,select]
+colnames(saf_ref)<-c('GeneID','Chr','Start','End','Strand') 
+
+cat('Creating SAF ref file \n')
+write.table(saf_ref,paste0(outdir,fprefix,'_peak_universe_updated.saf'),sep='\t',quote=FALSE,row.names=FALSE)
 
