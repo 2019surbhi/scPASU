@@ -200,8 +200,8 @@ joinTus_peaks<- function(allpeaks,rg)
   # fwrite(file=tsv,data.table(data.frame(rg$tu[fodt[cnt>1,queryHits],])),sep="\t",quote=FALSE,row.names=FALSE)
 
 
-        fo_tu <- data.table(as.data.frame(findOverlaps(peaks,rg$tu,ignore.strand=FALSE)))
-        fo_flank <- data.table(as.data.frame(findOverlaps(peaks,rg$flank,ignore.strand=FALSE)))
+        fo_tu <- data.table(as.data.frame(findOverlaps(peaks,rg$tu)))
+        fo_flank <- data.table(as.data.frame(findOverlaps(peaks,rg$flank)))
 
         fo_tu$set <- "tu"
         fo_flank$set <- "flank"
@@ -343,22 +343,22 @@ getTableHeaderFromSQL <- function(sql.file)
 }
 
 
-create_final_annotation_col<-function(multi_tu)
+create_final_annotation_col<-function(mtu, is_minus=FALSE)
 {
 # sort
-multi_tu<-multi_tu[mixedorder(multi_tu$tu),]
+mtu<-mtu[mixedorder(mtu$tu),]
 
 # Sort minus strand differently for correct annotation
-if(multi_tu$strand=='-')
+if(is_minus==TRUE)
 {
-  multi_tu<-multi_tu %>% arrange(., chr,desc(start))
+  mtu<-dplyr::arrange(mtu,chr,desc(start))
 }
 
-tu<-unique(multi_tu$tu)
-cnt<-multi_tu %>% group_by(tu) %>% tally()
+tu<-unique(mtu$tu)
+cnt<-mtu %>% group_by(tu) %>% tally()
 cnt<-cnt[order(cnt$n),]
 
-multi_tu$final_annotation<-rep('none',nrow(multi_tu))
+mtu$final_annotation<-rep('none',nrow(mtu))
 
 for(i in 1:length(tu))
 {
@@ -367,12 +367,12 @@ for(i in 1:length(tu))
   
   n<-cnt$n[indx]
   p<-paste0('P',(1:n))
-  indx2<-which(multi_tu$tu %in% tu[i])
-  new_anno<-paste0(multi_tu$tu_anno[indx2],':',p)
-  multi_tu$final_annotation[indx2]<-new_anno
+  indx2<-which(mtu$tu %in% tu[i])
+  new_anno<-paste0(mtu$tu_anno[indx2],':',p)
+  mtu$final_annotation[indx2]<-new_anno
   
 }
-return(multi_tu)
+return(mtu)
 
 }
 
