@@ -23,15 +23,14 @@ module load bedtools/2.29.0
 #extn=25
 #extn=50
 #extn=75
-#extn=100
+extn=100
 #extn=125
-extn=149
+#extn=149
 
 dir='/home/sonas/beegfs/APA/scPASU/'
-peaks_ref_dir='/home/sonas/beegfs/APA/scPASU/output/2_PeakRef/2c_intersect/e'${extn}'/'
+peaks_ref_dir='/home/sonas/beegfs/APA/scPASU/output/3_RefinePeakRef/3a_assign_TU/e'${extn}'/'
 file_prefix='u10_uro_l300iA10mm3_e'${extn}
 gtf_file='/home/sonas/beegfs/ref/refdata-gex-GRCh38-2020-A/genes/genes.gtf'
-#out_dir='/home/sonas/beegfs/APA/scPASU/output/2_PeakRef/2d_TU_annotated/'
 
 
 Rscript ${dir}/scripts/2_assign_tu.R 30 ${dir} ${peaks_ref_dir} ${file_prefix} ${gtf_file}
