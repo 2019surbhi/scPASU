@@ -100,7 +100,7 @@ cols<-colnames(merged_m)
 
 # In my outputs for minus strand end<start but this generates error in GRange so swap colnames
 cat('Reordering columns in minus strand files \n')
-colnames(merged_m)<-cols[c(1,3,2,4:8,10,9,11:14)]
+colnames(merged_m)<-cols[c(1,3,2,4:9,11,10,12:14)]
 
 files_p<-list.files(peaks_dir_p,full.names = TRUE)
 file_lst_p<-lapply(files_p,fread,header=TRUE)
@@ -128,7 +128,7 @@ write.table(merged,paste0(outdir,fprefix,'_peak_universe.txt'),sep='\t',row.name
 
 # Read in the data file
 
-#merged<- read.table('/home/sonas/beegfs/APA/scAPA/ureter10/u10_uro_BAMfiltered_peak_universe/u10_uro_BAMfiltered_peak_universe.txt', sep='\t',header=TRUE)
+#merged<- read.table('/u10_uro_peak_universe.txt', sep='\t',header=TRUE)
 
 cat('Creating GRange obj \n')
 peaks<-makeGRanges(merged,strand=T)
@@ -142,10 +142,12 @@ save(jtu,peaks,red_ens,file=output_file)
 
 # Create Peak reference with all relevant columns merged after TU assignment #
 
-jtu$join<-as.data.frame(jtu$join)
+#jtu$join<-as.data.frame(jtu$join)
 # Remove multi-TU peaks
-rem<-which(jtu$join$unique_peak==FALSE)
-tu_tab<-jtu$join[-rem,] 
+r1<-which(jtu$join$unique_peak==FALSE)
+tu_tab<-jtu$join[-r1,] 
+r2<-which(jtu$join$unique_tu==FALSE)
+tu_tab<-jtu$join[-r2,] 
 
 # Create peak per TU count
 tu_peak<-jtu$join %>% select(peak,tu) %>% group_by(tu) %>% tally()
