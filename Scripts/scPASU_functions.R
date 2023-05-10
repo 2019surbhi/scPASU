@@ -350,18 +350,5 @@ getTableHeaderFromSQL <- function(sql.file)
     cols
 }
 
-get_feature_counts<-fucntion(bam_file,ref,out,prefix,cores,isGTF)
-{
-if(isGTF=='yes')
-{
-  counts<-featureCounts(bam_file, annot.ext=ref, isGTFAnnotationFile=TRUE, GTF.attrType='gene_name', strandSpecific=1, largestOverlap = T, nthreads = cores)
-  fname<-paste0(out,prefix,'_gene_by_cell_count.rds')
-}else{
-  counts<-featureCounts(bam_file, annot.ext = ref, isGTFAnnotationFile = FALSE,strandSpecific=1, largestOverlap = T, nthreads = cores)
-  fname<-paste0(out,prefix,'_peak_by_cell_count.rds')
-}
-
-saveRDS(counts, fname)
-}
 
 
