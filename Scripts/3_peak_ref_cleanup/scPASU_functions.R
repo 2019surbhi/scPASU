@@ -341,4 +341,39 @@ getTableHeaderFromSQL <- function(sql.file)
 
     cols
 }
+
+
+create_final_annotation_col<-function(multi_tu)
+{
+# sort
+multi_tu<-multi_tu[mixedorder(multi_tu$tu),]
+
+# Sort minus strand differently for correct annotation
+if(multi_tu$strand=='-')
+{
+  multi_tu<-multi_tu %>% arrange(., chr,desc(start))
+}
+
+tu<-unique(multi_tu$tu)
+cnt<-multi_tu %>% group_by(tu) %>% tally()
+cnt<-cnt[order(cnt$n),]
+
+multi_tu$final_annotation<-rep('none',nrow(multi_tu))
+
+for(i in 1:length(tu))
+{
+  
+  indx<-match(tu[i],cnt$tu)
+  
+  n<-cnt$n[indx]
+  p<-paste0('P',(1:n))
+  indx2<-which(multi_tu$tu %in% tu[i])
+  new_anno<-paste0(multi_tu$tu_anno[indx2],':',p)
+  multi_tu$final_annotation[indx2]<-new_anno
+  
+}
+return(multi_tu)
+
+}
+
                                                                                      
