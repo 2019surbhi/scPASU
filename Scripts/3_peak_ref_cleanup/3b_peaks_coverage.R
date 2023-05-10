@@ -17,15 +17,8 @@ counts_file=args[2]
 ref<-fread(ref_file)
 counts<-readRDS(counts_file)
 counts_mat<-counts$counts
-
-
 tu<-strsplit(ref$GeneID,split=':') %>% sapply(.,'[[',1)
-gene<-strsplit(ref$GeneID,split=':') %>% sapply(.,'[[',2)
-peak<-strsplit(ref$GeneID,split=':') %>% sapply(.,'[[',3)
-
-ref$tu<-tu
-ref$gene<-gene
-ref$peak<-peak
+tu<-unique(tu)
 
 updated_mat<-data.frame()
 
@@ -37,6 +30,18 @@ cov<-sum(sub)
 pcov<-apply(sub,1,sum)
 pcov_pct<-(pcov/cov)*100
 sub<-cbind(sub,pcov_pct)
+colnames(sub)<-c('counts','cov_pct')
+
+# Add relevant info
+tu<-strsplit(rownames(sub),split=':') %>% sapply(.,'[[',1) 
+gene<-strsplit(rownames(sub),split=':') %>% sapply(.,'[[',2) 
+peak<-strsplit(rownames(sub),split=':') %>% sapply(.,'[[',3) 
+annotation<-rownames(sub)
+
+sub$tu<-tu
+sub$gene<-gene
+sub$peak<-peak
+sub$annotation<-annotation
 
 if(nrow(updated_mat)==0)
 {
@@ -46,7 +51,6 @@ if(nrow(updated_mat)==0)
 }
 }
 
-colnames(updated_mat)<-c('counts','cov_pct')
-out<-dir(counts_file)
+#out<-dir(counts_file)
 fname<-gsub('.rds','_updated.rds',basename(counts_file))
 saveRDS(updated_mat,paste0(out,fname))
