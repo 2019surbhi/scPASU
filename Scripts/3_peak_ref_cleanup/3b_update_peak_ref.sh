@@ -21,7 +21,7 @@ strand='plus'
 
 cores=30
 bam_dir='/home/sonas/beegfs/APA/scPASU/output/1_process_bam/1e_merged_bam/'
-bam=dedup_u10_uro_clean_filtered2_${strand}.bam
+bam=dedup_u10_uro_clean_filtered_${strand}.bam
 
 ref='/home/sonas/beegfs/APA/scPASU/output/3_RefinePeakRef/3a_assign_TU/u10_uro_peak_universe_updated.saf'
 outdir='/home/sonas/beegfs/APA/scPASU/output/3_RefinePeakRef/3b_PeakCoverage'
