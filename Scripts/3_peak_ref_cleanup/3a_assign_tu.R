@@ -17,7 +17,7 @@ gtf_file=argv[5] # gtf file with full path
 script_dir<-paste0(dir,'/scripts/')
 source(paste0(script_dir,'/scPASU_functions.R'))
 
-outdir<-paste0(dir,/output/2_PeakRef/2d_TU_annotated/')
+outdir<-paste0(dir,/output/3_RefinePeakRef/3a_assign_TU/')
 inputdir<-paste0(dir,'/input/')
 
 # HPC paths
