@@ -9,8 +9,8 @@ ref_file=args[1]
 counts_file=args[2]
 
 # HPC paths 
-ref_file='/home/sonas/beegfs/APA/scPASU/output/3_RefinePeakRef/3a_assign_TU/u10_uro_peak_universe_minus_updated.saf'
-counts_file='/home/sonas/beegfs/APA/scPASU/output/3_RefinePeakRef/3b_PeakCoverage2/u10_uro_minus_peak_by_cell_count.rds'
+#ref_file='/home/sonas/beegfs/APA/scPASU/output/3_RefinePeakRef/3a_assign_TU/u10_uro_peak_universe_minus_updated.saf'
+#counts_file='/home/sonas/beegfs/APA/scPASU/output/3_RefinePeakRef/3b_PeakCoverage2/u10_uro_minus_peak_by_cell_count.rds'
 
 
 #Read inputs
