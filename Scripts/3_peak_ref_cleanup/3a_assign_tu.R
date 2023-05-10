@@ -5,9 +5,7 @@ library(goldmine)
 library(rtracklayer)
 library(dplyr)
 library(data.table)
-
-#source('/home/sonas/beegfs/APA/scAPA/ureter10/misc/scAPA_paddle.R')
-#source('/home/sonas/beegfs/results/scAPA/my_scAPA/ureter_uro/macs2_u10_uro_merged/script/scAPA_paddle.R')
+library(gtools)
 
 argv<-commandArgs(trailing = TRUE)
 ncpu <- argv[1]
@@ -94,8 +92,7 @@ peaks_dir_m=paste0(peaks_dir,'/minus/4_polya_supported_peak_ref/')
 peaks_dir_p=paste0(peaks_dir,'/plus/4_polya_supported_peak_ref/')
 
 files_m<-list.files(peaks_dir_m,full.names = TRUE)
-selected<-files_m[grep('chr',files_m)]
-file_lst_m<-lapply(selected,fread,header=TRUE)
+file_lst_m<-lapply(files_m,fread,header=TRUE)
 merged_m<-do.call(bind_rows,file_lst_m)
 
 # correct colnames (if needed)
@@ -103,14 +100,13 @@ cols<-colnames(merged_m)
 
 # In my outputs for minus strand end<start but this generates error in GRange so swap colnames
 cat('Reordering columns in minus strand files \n')
-colnames(merged_m)<-cols[c(1,3,2,4:8,10,9,11:13)]
+colnames(merged_m)<-cols[c(1,3,2,4:8,10,9,11:14)]
 
 files_p<-list.files(peaks_dir_p,full.names = TRUE)
-selected<-files_p[grep('chr',files_m)]
-file_lst_p<-lapply(selected,fread,header=TRUE)
+file_lst_p<-lapply(files_p,fread,header=TRUE)
 merged_p<-do.call(bind_rows,file_lst_p)
 
-merged<-bind_rows(merged_m,merged_p)
+merged<-rbind(merged_m,merged_p)
 
 # Rename columns since GRange recognizes start, end and strand only
 cat('Renaming colnames to create GRange obj \n')
@@ -142,3 +138,81 @@ jtu <- joinTus_peaks(allpeaks=peaks,rg=red_ens)
 
 cat('Save all tables \n')
 save(jtu,peaks,red_ens,file=output_file)
+
+
+# Create Peak reference with all relevant columns merged after TU assignment #
+
+jtu$join<-as.data.frame(jtu$join)
+# Remove multi-TU peaks
+rem<-which(jtu$join$unique_peak==FALSE)
+tu_tab<-jtu$join[-rem,] 
+
+# Create peak per TU count
+tu_peak<-jtu$join %>% select(peak,tu) %>% group_by(tu) %>% tally()
+
+# Peaks (saved from merging all peaks from MACS2 output)
+peaks<-as.data.frame(jtu$polya_peaks)
+found<-match(tu_tab$peak,peaks$peakID)
+length(found)
+matched_peaks<-peaks[found,]
+
+# Sort all tables
+tu_tab<-tu_tab[mixedorder(tu_tab$peak),]
+matched_peaks<-matched_peaks[mixedorder(matched_peaks$peakID),]
+
+# Now lets transfer peak info to TU table
+identical(tu_tab$peak,matched_peaks$peakID) # TRUE
+
+tu_tab$chr<-matched_peaks$seqnames
+tu_tab$start<-matched_peaks$start
+tu_tab$end<-matched_peaks$end
+tu_tab$strand<-matched_peaks$strand
+
+
+# Also transfer other info for future use. This table can then serve as comprehensive features table
+
+tu_tab$peak_width<-matched_peaks$peak_width
+tu_tab$pr_chr<-matched_peaks$pr_chr
+tu_tab$pr_start<-matched_peaks$pr_start
+tu_tab$pr_end<-matched_peaks$pr_end
+tu_tab$pr_strand<-matched_peaks$pr_strand
+tu_tab$pr_width<-matched_peaks$pr_width
+tu_tab$polya_count<-matched_peaks$polya_count
+
+# Now add peakID to tu annotation column (multi peak TU will look like TU1:gene:P1, TU1:gene:P2 and TU1:gene:P3 while single peak TU will look like TU2:gene:P0)
+
+# Get TU count
+tu_count<-tu_tab %>% group_by(tu) %>% tally()
+
+# Sort
+tu_count<-tu_count[order(tu_count$n),]
+
+#Single peak per TU
+single<-which(tu_count$n==1)
+s<-match(tu_count$tu[single],tu_tab$tu)
+single_tu<-tu_tab[s,]
+single_tu$tu %>% unique() %>% length()
+single_tu$final_annotation<-paste0(single_tu$tu_anno,':P0')
+
+# Multi peak TU -
+multi_tu<-tu_tab[-s,]
+
+# Split by strand
+multi_tu_p<-multi_tu[multi_tu$strand=='+',]
+multi_tu_m<-multi_tu[multi_tu$strand=='-',]
+
+# Now add final annotation col
+multi_tu_p2<-create_final_annotation_col(multi_tu_p)
+multi_tu_m2<-create_final_annotation_col(multi_tu_m,is_minus=TRUE)
+
+# Merge plus and minus strand
+multi_tu2<-rbind(multi_tu_p2,multi_tu_m2)
+
+# Add P0 genes back to ref
+merged_tu3<-rbind(single_tu,multi_tu2)
+
+# Save
+merged_tu3<-merged_tu3 %>% as.data.frame()
+
+write.table(merged_tu3,paste0(outdir,fprefix,'_updated.txt'),sep='\t',row.names=FALSE,col.names=TRUE)
+
