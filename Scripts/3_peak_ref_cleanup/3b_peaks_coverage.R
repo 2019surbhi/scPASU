@@ -7,41 +7,56 @@ args <- commandArgs(trailing = TRUE)
 
 ref_file=args[1]
 counts_file=args[2]
+out<-args[3]
 
 # HPC paths 
 #ref_file='/home/sonas/beegfs/APA/scPASU/output/3_RefinePeakRef/3a_assign_TU/u10_uro_peak_universe_minus_updated.saf'
 #counts_file='/home/sonas/beegfs/APA/scPASU/output/3_RefinePeakRef/3b_PeakCoverage2/u10_uro_minus_peak_by_cell_count.rds'
 
 
-#Read inputs
-ref<-fread(ref_file)
+#Read counts
 counts<-readRDS(counts_file)
-counts_mat<-counts$counts
-tu<-strsplit(ref$GeneID,split=':') %>% sapply(.,'[[',1)
+counts_mat<-counts$counts %>% as.data.frame()
+colnames(counts_mat)<-'counts'
+
+# Add annotation cols
+tu<-strsplit(rownames(counts_mat),split=':') %>% sapply(.,'[[',1)
+gene<-strsplit(rownames(counts_mat),split=':') %>% sapply(.,'[[',2)
+peak<-strsplit(rownames(counts_mat),split=':') %>% sapply(.,'[[',3)
+
+counts_mat$tu<-tu
+counts_mat$gene<-gene
+counts_mat$peak<-peak
+counts_mat$anno<-rownames(counts_mat)
+
+# Read ref 
+ref<-fread(ref_file)
+
+# Create separate counts matrix for P0 genes
+p0<-which(counts_mat$peak=='P0')
+counts_p0<-counts_mat[p0,]
+counts_p0$pcov_pct<-100
+
+# Sanity check
+identical(ref$GeneID,rownames(counts_mat))
+
+# Remove P0 genes from ref
+ref2<-ref[-p0,]
+tu<-strsplit(ref2$GeneID,split=':') %>% sapply(.,'[[',1)
 tu<-unique(tu)
+
+# Proceed with multi TU genes
+counts_mat2<-counts_mat[-p0,]
 
 updated_mat<-data.frame()
 
 for(i in 1:length(tu))
 {
-r<-grep(tu[i],rownames(counts_mat))
-sub<-counts_mat[r,] %>% as.data.frame()
-cov<-sum(sub)
-pcov<-apply(sub,1,sum)
-pcov_pct<-(pcov/cov)*100
-sub<-cbind(sub,pcov_pct)
-colnames(sub)<-c('counts','cov_pct')
-
-# Add relevant info
-tu<-strsplit(rownames(sub),split=':') %>% sapply(.,'[[',1) 
-gene<-strsplit(rownames(sub),split=':') %>% sapply(.,'[[',2) 
-peak<-strsplit(rownames(sub),split=':') %>% sapply(.,'[[',3) 
-annotation<-rownames(sub)
-
-sub$tu<-tu
-sub$gene<-gene
-sub$peak<-peak
-sub$annotation<-annotation
+r<-which(counts_mat2$tu==tu[i])
+sub<-counts_mat2[r,]
+cov<-sum(sub$counts)
+pcov_pct<-(sub$counts/cov)*100
+sub$pcov_pct<-pcov_pct
 
 if(nrow(updated_mat)==0)
 {
@@ -50,6 +65,11 @@ if(nrow(updated_mat)==0)
   updated_mat<-rbind(updated_mat,sub)
 }
 }
+
+# Merge matrices
+
+updated_mat<-rbind(counts_p0,updated_mat)
+
 
 #out<-dir(counts_file)
 fname<-gsub('.rds','_updated.rds',basename(counts_file))
