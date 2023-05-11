@@ -41,6 +41,9 @@ counts_mat$start<-ref$Start
 counts_mat$end<-ref$End
 counts_mat$strand<-ref$Strand
 
+# Finally add peakID which will help match retained peaks later on (note: this col is labelled as 'peak' in ref table)
+counts_mat$peakID<-ref$peak 
+
 # Create separate counts matrix for P0 genes
 p0<-which(counts_mat$peak=='P0')
 counts_p0<-counts_mat[p0,]
