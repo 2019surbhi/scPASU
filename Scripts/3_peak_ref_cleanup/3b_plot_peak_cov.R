@@ -16,7 +16,7 @@ x=args[6]
 y=args[7]
 
 #HPC paths
-# pcov_file='u10_uro_plus_peak_by_cell_count_updated.rds'
+# pcov_file='u10_uro_plus_peak_count_updated.rds'
 # out='/home/sonas/beegfs/APA/scPASU/output/3_RefinePeakRef/3b_PeakCoverage2/'
 # fprefix='u10_uro_plus'
 
