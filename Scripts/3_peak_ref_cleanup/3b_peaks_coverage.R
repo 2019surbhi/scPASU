@@ -32,13 +32,20 @@ counts_mat$anno<-rownames(counts_mat)
 # Read ref 
 ref<-fread(ref_file)
 
+# Sanity check
+identical(ref$GeneID,rownames(counts_mat))
+
+# Add Peak coordinates as well
+counts_mat$chr<-ref$Chr
+counts_mat$start<-ref$Start
+counts_mat$end<-ref$End
+counts_mat$strand<-ref$Strand
+
 # Create separate counts matrix for P0 genes
 p0<-which(counts_mat$peak=='P0')
 counts_p0<-counts_mat[p0,]
 counts_p0$pcov_pct<-100
 
-# Sanity check
-identical(ref$GeneID,rownames(counts_mat))
 
 # Remove P0 genes from ref
 ref2<-ref[-p0,]
