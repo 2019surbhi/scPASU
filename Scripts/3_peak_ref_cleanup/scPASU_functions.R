@@ -376,4 +376,39 @@ return(mtu)
 
 }
 
+
+get_histogram<-function(dat,binw,col='royal blue',fill='salmon', x_lim='none',y_lim='none',title,x_lab)
+{
+  if(length(x_lim)==1)
+  {
+    x_lim<-c(0,max(dat))
+  }
+  rem<-dat[dat>x_lim[2]] %>% length()
+  rem_perc<-((rem/length(dat)) *100) %>% round(.,digits = 1)
+  
+  if(length(x_lim)==1)
+  {h<-ggplot()+
+    geom_histogram(aes(dat),binwidth=binw, colour=col,fill= fill)+
+    xlim(x_lim)
+  }else{
+    h<-ggplot()+
+      geom_histogram(aes(dat),binwidth=binw, colour=col,fill= fill)+
+      xlim(x_lim) + ylim(y_lim)
+  }
+  
+  min<-min(dat)
+  max<-max(dat)
+  
+  h<-h+labs(title = title,
+            subtitle = paste0('[binwidth:',binw,']', ' [min:',min,'; max:', max,']'),
+            caption=paste0('[',rem_perc,'% datapoints removed by the given cutoff]'))+
+    xlab(x_lab)+theme_bw()+
+    theme(plot.caption=element_text(color='navy blue',
+                                    size=8),
+          text = element_text(size=30))
+  return(h)
+}
+
+
+
                                                                                      
