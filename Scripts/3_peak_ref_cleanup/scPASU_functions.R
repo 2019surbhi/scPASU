@@ -14,7 +14,7 @@ library(GenomicRanges)
 library(goldmine)
 library(rtracklayer)
 library(dplyr)
-
+library(gtools)
 
 ### This function creates TUs ###
 reduceGenes <- function(genes,chrs,flank=5000,ncore=1)
@@ -368,7 +368,7 @@ for(i in 1:length(tu))
   n<-cnt$n[indx]
   p<-paste0('P',(1:n))
   indx2<-which(mtu$tu %in% tu[i])
-  new_anno<-paste0(mtu$tu_anno[indx2],':',p)
+  new_anno<-paste0(mtu$tu[indx2],':',mtu$gene[indx2],':',p)
   mtu$final_annotation[indx2]<-new_anno
   
 }
