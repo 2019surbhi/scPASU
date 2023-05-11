@@ -27,7 +27,7 @@ peak<-strsplit(rownames(counts_mat),split=':') %>% sapply(.,'[[',3)
 counts_mat$tu<-tu
 counts_mat$gene<-gene
 counts_mat$peak<-peak
-counts_mat$anno<-rownames(counts_mat)
+counts_mat$final_annotation<-rownames(counts_mat)
 
 # Read ref 
 ref<-fread(ref_file)
