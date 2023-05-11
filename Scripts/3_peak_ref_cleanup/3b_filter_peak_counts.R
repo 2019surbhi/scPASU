@@ -32,5 +32,5 @@ pn_mat<-pcov_mat2[!(pcov_mat2$tu %in% cnt$tu[r]),]
 
 pn_mat2<-create_final_annotation_col(pn_mat,is_minus=is_minus)
 pcov_mat3<-rbind(p0_mat,pn_mat)
-saveRDS(pcov_mat3,paste0(out,fprefix,'_filtered_peak_count.rds))
+saveRDS(pcov_mat3,paste0(out,fprefix,'_filtered_peak_count.rds'))
 
