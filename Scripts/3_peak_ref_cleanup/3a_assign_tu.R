@@ -222,6 +222,17 @@ merged_tu3<-merged_tu3 %>% as.data.frame()
 write.table(merged_tu3,paste0(outdir,fprefix,'_peak_universe_updated.txt'),sep='\t',row.names=FALSE,col.names=TRUE)
 
 
+
+
+# Also save a strand specific .saf
+saf_ref_m<-saf_ref[saf_ref$Strand=='-',]
+saf_ref_p<-saf_ref[saf_ref$Strand=='+',]
+
+write.table(saf_ref_m,paste0(outdir,fprefix,'_peak_universe_minus_updated.saf'),sep='\t',quote=FALSE,row.names=FALSE)
+write.table(saf_ref_p,paste0(outdir,fprefix,'_peak_universe_plus_updated.saf'),sep='\t',quote=FALSE,row.names=FALSE)
+
+
+
 # Create SAF format peak ref too
 
 # Select relevant columns
