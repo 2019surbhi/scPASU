@@ -100,7 +100,8 @@ cols<-colnames(merged_m)
 
 # In my outputs for minus strand end<start but this generates error in GRange so swap colnames
 cat('Reordering columns in minus strand files \n')
-colnames(merged_m)<-cols[c(1,3,2,4:9,11,10,12:14)]
+
+#colnames(merged_m)<-cols[c(1,3,2,4:9,11,10,12:14)]
 
 files_p<-list.files(peaks_dir_p,full.names = TRUE)
 file_lst_p<-lapply(files_p,fread,header=TRUE)
@@ -143,7 +144,7 @@ save(jtu,peaks,red_ens,file=output_file)
 # Create Peak reference with all relevant columns merged after TU assignment #
 cat('Add other relevant cols \n')
 
-#jtu$join<-as.data.frame(jtu$join)
+jtu$join<-as.data.frame(jtu$join)
 # Remove multi-TU peaks
 r1<-which(jtu$join$unique_peak==FALSE)
 tu_tab<-jtu$join[-r1,] 
@@ -151,7 +152,7 @@ tu_tab<-jtu$join[-r1,]
 #tu_tab<-jtu$join[-r2,] 
 
 # Create peak per TU count
-tu_peak<-jtu$join %>% select(peak,tu) %>% group_by(tu) %>% tally()
+tu_peak<-jtu$join %>% dplyr::select(peak,tu) %>% group_by(tu) %>% tally()
 
 # Peaks (saved from merging all peaks from MACS2 output)
 peaks<-as.data.frame(jtu$polya_peaks)
@@ -181,6 +182,7 @@ tu_tab$pr_end<-matched_peaks$pr_end
 tu_tab$pr_strand<-matched_peaks$pr_strand
 tu_tab$pr_width<-matched_peaks$pr_width
 tu_tab$polya_count<-matched_peaks$polya_count
+tu_tab$polya_count<-matched_peaks$peakID
 
 # Now add peakID to tu annotation column (multi peak TU will look like TU1:gene:P1, TU1:gene:P2 and TU1:gene:P3 while single peak TU will look like TU2:gene:P0)
 
