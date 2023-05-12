@@ -141,6 +141,7 @@ save(jtu,peaks,red_ens,file=output_file)
 
 
 # Create Peak reference with all relevant columns merged after TU assignment #
+cat('Add other relevant cols \n')
 
 #jtu$join<-as.data.frame(jtu$join)
 # Remove multi-TU peaks
