@@ -146,8 +146,8 @@ save(jtu,peaks,red_ens,file=output_file)
 # Remove multi-TU peaks
 r1<-which(jtu$join$unique_peak==FALSE)
 tu_tab<-jtu$join[-r1,] 
-r2<-which(jtu$join$unique_tu==FALSE)
-tu_tab<-jtu$join[-r2,] 
+#r2<-which(jtu$join$unique_tu==FALSE)
+#tu_tab<-jtu$join[-r2,] 
 
 # Create peak per TU count
 tu_peak<-jtu$join %>% select(peak,tu) %>% group_by(tu) %>% tally()
