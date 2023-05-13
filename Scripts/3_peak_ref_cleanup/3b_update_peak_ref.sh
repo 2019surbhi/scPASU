@@ -27,10 +27,10 @@ bam_dir='/home/sonas/beegfs/APA/scPASU/output/1_process_bam/1e_merged_bam/'
 bam=${bam_dir}dedup_u10_uro_clean_filtered_${strand}.bam
 
 ref_dir='/home/sonas/beegfs/APA/scPASU/output/3_RefinePeakRef/3a_assign_TU/'
-#ref=${ref_dir}u10_uro_peak_universe_updated.saf
-ref=${ref_dir}u10_uro_peak_universe_${strand}_updated.saf
+#ref=${ref_dir}
+ref=${ref_dir}u10_uro_filtered_100_peak_universe_updated.txt
 
-outdir='/home/sonas/beegfs/APA/scPASU/output/3_RefinePeakRef/3b_PeakCoverage2/'
+outdir='/home/sonas/beegfs/APA/scPASU/output/3_RefinePeakRef/3b_PeakCoverage/'
 fprefix=u10_uro_${strand}
 
 script_dir='/home/sonas/beegfs/APA/scPASU/scripts/'
@@ -42,7 +42,7 @@ script_dir='/home/sonas/beegfs/APA/scPASU/scripts/'
 
 counts_file=${outdir}${fprefix}_peak_count.rds
 
-#Rscript ${script_dir}3b_peaks_coverage.R ${ref} ${counts_file} ${outdir}
+Rscript ${script_dir}3b_peaks_coverage.R ${ref} ${counts_file} ${outdir}
 
 # 3.  Plot peak coverage percent
 
