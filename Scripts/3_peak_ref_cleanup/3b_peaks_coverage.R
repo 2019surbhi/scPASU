@@ -10,7 +10,7 @@ counts_file=args[2]
 out<-args[3]
 
 # HPC paths 
-#ref_file='/home/sonas/beegfs/APA/scPASU/output/3_RefinePeakRef/3a_assign_TU/u10_uro_peak_universe_minus_updated.saf'
+#ref_file='/home/sonas/beegfs/APA/scPASU/output/3_RefinePeakRef/3a_assign_TU/u10_uro_filtered_100_peak_universe_updated.txt'
 #counts_file='/home/sonas/beegfs/APA/scPASU/output/3_RefinePeakRef/3b_PeakCoverage2/u10_uro_minus_peak_count.rds'
 
 
@@ -31,6 +31,10 @@ counts_mat$final_annotation<-rownames(counts_mat)
 
 # Read ref 
 ref<-fread(ref_file)
+
+# Subset and sort ref 
+idx<-match(rownames(counts_mat),ref$final_annotation)
+ref<-ref[idx,]
 
 # Sanity check
 identical(ref$GeneID,rownames(counts_mat))
