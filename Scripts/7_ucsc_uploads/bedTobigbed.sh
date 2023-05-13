@@ -46,8 +46,8 @@ outdir='/home/sonas/beegfs/APA/scPASU/output/7_UCSC_uploads/bigbed/'
 
 cd ${dir}
 
-cat ${bed} | grep - > ${dir}${bed_prefix}_minus.bed
-cat ${bed} | grep + > ${dir}${bed_prefix}_plus.bed
+cat ${bed_prefix}.bed | grep - > ${dir}${bed_prefix}_minus.bed
+cat ${bed_prefix}.bed | grep + > ${dir}${bed_prefix}_plus.bed
 
 # Sort
 
@@ -58,4 +58,6 @@ sort -k 1,1 -k2,2n ${dir}${bed_prefix}_plus.bed > ${dir}${bed_prefix}_plus_sorte
 # Convert to bigBed
 bedToBigBed ${dir}${bed_prefix}_minus_sorted.bed ${ref_dir}chr.sizes ${outdir}${bed_prefix}_minus.bb
 bedToBigBed ${dir}${bed_prefix}_plus_sorted.bed  ${ref_dir}chr.sizes ${outdir}${bed_prefix}_plus.bb
+
+
 
