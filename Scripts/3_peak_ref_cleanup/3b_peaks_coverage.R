@@ -40,10 +40,10 @@ ref<-ref[idx,]
 identical(ref$GeneID,rownames(counts_mat))
 
 # Add Peak coordinates as well
-counts_mat$chr<-ref$Chr
-counts_mat$start<-ref$Start
-counts_mat$end<-ref$End
-counts_mat$strand<-ref$Strand
+counts_mat$chr<-ref$chr
+counts_mat$start<-ref$start
+counts_mat$end<-ref$end
+counts_mat$strand<-ref$strand
 
 # Finally add peakID which will help match retained peaks later on (note: this col is labelled as 'peak' in ref table)
 counts_mat$peakID<-ref$peak 
@@ -56,7 +56,7 @@ counts_p0$pcov_pct<-100
 
 # Remove P0 genes from ref
 ref2<-ref[-p0,]
-tu<-strsplit(ref2$GeneID,split=':') %>% sapply(.,'[[',1)
+tu<-strsplit(ref2$tu_anno,split=':') %>% sapply(.,'[[',1)
 tu<-unique(tu)
 
 # Proceed with multi TU genes
