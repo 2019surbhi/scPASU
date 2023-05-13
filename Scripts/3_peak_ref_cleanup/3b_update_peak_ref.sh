@@ -27,8 +27,7 @@ bam_dir='/home/sonas/beegfs/APA/scPASU/output/1_process_bam/1e_merged_bam/'
 bam=${bam_dir}dedup_u10_uro_clean_filtered_${strand}.bam
 
 ref_dir='/home/sonas/beegfs/APA/scPASU/output/3_RefinePeakRef/3a_assign_TU/'
-#ref=${ref_dir}
-ref=${ref_dir}u10_uro_filtered_100_peak_universe_updated.txt
+ref_saf=${ref_dir}u10_uro_filtered_100_peak_universe_updated.saf
 
 outdir='/home/sonas/beegfs/APA/scPASU/output/3_RefinePeakRef/3b_PeakCoverage/'
 fprefix=u10_uro_${strand}
@@ -36,11 +35,13 @@ fprefix=u10_uro_${strand}
 script_dir='/home/sonas/beegfs/APA/scPASU/scripts/'
 
 # 1. Calculate peak counts
-#Rscript ${script_dir}feature_counts.R ${bam} ${ref} ${outdir} ${fprefix} ${cores} no
+
+Rscript ${script_dir}feature_counts.R ${bam} ${ref_saf} ${outdir} ${fprefix} ${cores} no
 
 # 2. Calculate per TU peak coverage
 
 counts_file=${outdir}${fprefix}_peak_count.rds
+ref=${ref_dir}u10_uro_filtered_100_peak_universe_updated.txt
 
 Rscript ${script_dir}3b_peaks_coverage.R ${ref} ${counts_file} ${outdir}
 
@@ -56,8 +57,9 @@ fprefix=u10_uro_${strand}
 #Rscript ${script_dir}3b_plot_peak_cov.R ${pcov_file} ${outdir} ${fprefix} ${w} ${h} ${x} ${y}
 
 # 4. Filter peak count mat
-min_cov=5
+min_cov=10
+out='/home/sonas/beegfs/APA/scPASU/output/3_RefinePeakRef/3c_updated_peaks/'
+fprefix=u10_uro_${strand}_filtered_
 
-Rscript ${script_dir}3b_filter_peak_count.R ${pcov_file} ${outdir} ${fprefix} ${min_cov} ${is_minus}
-
+Rscript ${script_dir}3b_filter_peak_ref.R ${ref} ${pcov_file} ${out} ${fprefix} ${min_cov} ${is_minus}
 
