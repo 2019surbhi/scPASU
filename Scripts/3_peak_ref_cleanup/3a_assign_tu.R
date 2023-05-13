@@ -171,7 +171,7 @@ tu_tab$chr<-matched_peaks$seqnames
 tu_tab$start<-matched_peaks$start
 tu_tab$end<-matched_peaks$end
 tu_tab$strand<-matched_peaks$strand
-
+tu_tab$gene<-strsplit(tu_tab$tu_anno,split=':') %>% sapply(.,'[[',2)
 
 # Also transfer other info for future use. This table can then serve as comprehensive features table
 
