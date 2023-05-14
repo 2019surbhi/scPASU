@@ -45,4 +45,4 @@ pn_updated<-create_final_annotation_col(pn,is_minus=is_minus)
 ref_filtered_updated<-rbind(p0,pn_updated)
 
 
-write.table(ref_filtered_updated,paste0(out,frefix',_filtered_peak_ref.txt'),col.names=TRUE,row.names=FALSE,sep='\t',quote=FALSE)
+write.table(ref_filtered_updated,paste0(out,frefix,'_filtered_peak_ref.txt'),col.names=TRUE,row.names=FALSE,sep='\t',quote=FALSE)
