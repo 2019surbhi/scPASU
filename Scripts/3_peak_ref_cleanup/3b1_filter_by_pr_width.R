@@ -3,33 +3,23 @@
 library(dplyr)
 library(data.table)
 
-source('/home/sonas/beegfs/APA/scPASU/scripts/scPASU_functions.R')
-
 args <- commandArgs(trailing = TRUE)
 
 
-pcov_file=args[1]
-out=args[2]
-fprefix=args[3]
-min_cov=as.numeric(args[4])
-#is_minus=as.logical(args[5]) # TRUE or FALSE
+ref_file=args[1]
+cov_mat_file=args[2]
+out=args[3]
+frefix=args[4]
+max_width=as.numeric(args[5])
 
+# HPC paths
+
+#ref_file<-'/home/sonas/beegfs/APA/scPASU/output/3_RefinePeakRef/3a_assign_TU/u10_uro_peak_universe_updated.txt'
+#cov_mat_file<-'/home/sonas/beegfs/APA/scPASU/output/3_RefinePeakRef/3b_PeakCoverage2/u10_uro_minus_filtered_peak_count.rds'
+
+# Read inputs
 ref<-fread(ref_file)
-
-keep<-match(cov_mat_fil$anno,ref$final_annotation)
-ref_filtered<-ref[keep,]
-
-# Subset TUs that have now single peaks
-#cnt<-ref_filtered %>% group_by(tu) %>% tally()
-#cnt<-cnt %>% arrange(.,n)
-#r<-which(cnt$n==1)
-#p0<-ref_filtered[ref_filtered$tu %in% cnt$tu[r],]
-#pn<-ref_filtered[!(ref_filtered$tu %in% cnt$tu[r]),]
-
-#pn_updated<-create_final_annotation_col(pn,is_minus=is_minus)
-#ref_filtered_updated<-rbind(p0,pn_updated)
-
-#write.table(ref_filtered_updated,paste0(out,frefix,'_filtered_peak_ref.txt'),col.names=TRUE,row.names=FALSE,sep='\t',quote=FALSE)
+ref_fil<-cov_mat[which(ref$pr_width<=max_width),]
 
 write.table(ref_filtered,paste0(out,frefix,'_filtered_peak_ref.txt'),col.names=TRUE,row.names=FALSE,sep='\t',quote=FALSE)
 
