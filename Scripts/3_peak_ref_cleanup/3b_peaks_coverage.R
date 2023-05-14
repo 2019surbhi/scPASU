@@ -37,7 +37,7 @@ idx<-match(rownames(counts_mat),ref$final_annotation)
 ref<-ref[idx,]
 
 # Sanity check
-identical(ref$GeneID,rownames(counts_mat))
+identical(ref$final_annotation,rownames(counts_mat))
 
 # Add Peak coordinates as well
 counts_mat$chr<-ref$chr
