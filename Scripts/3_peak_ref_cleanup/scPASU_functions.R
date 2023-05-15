@@ -210,20 +210,13 @@ joinTus_peaks<- function(allpeaks,rg)
         fo_tu$coding <- rg$tu[fo_tu$subjectHits]$coding
         cat('Assigning TU anno \n')
         fo_tu$tu_anno <- rg$tu[fo_tu$subjectHits]$tu_anno
-        cat('Printing overlap for tu \n')
-        ft<-head(fo_tu)
-        ft
-        cat('\n')
-
+  
 
         fo_flank$tu <- rg$flank[fo_flank$subjectHits]$tu
         fo_flank$coding <- rg$flank[fo_flank$subjectHits]$coding
         cat('Assigning TU anno from flank \n')
         fo_flank$tu_anno <- rg$flank[fo_flank$subjectHits]$tu_anno
-        cat('Printing overlap for flank \n')
-        fo<-head(fo_flank)
-        fo
-        cat('\n')
+     
 
 
      # Remove cases where same PR links to same TU and flank of that TU
@@ -233,9 +226,7 @@ joinTus_peaks<- function(allpeaks,rg)
 
         ov <- rbind(fo_tu,fo_flank)
         cat('Printing merged overlap: \n')
-        o<-head(ov)
-        o
-        cat('\n')
+     
 
         # Join table that links each PR to a TU/flank
         cat('Create data table \n')
