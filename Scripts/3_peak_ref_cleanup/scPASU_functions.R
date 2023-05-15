@@ -189,16 +189,6 @@ joinTus_peaks<- function(allpeaks,rg)
   keep<-which(allpeaks$polya=='polya')
   peaks<-allpeaks[keep,]
 
-  #prs <- pr$pr
-
-  # tu_red <- reduce(rg$tu)
-  # fodt <- data.table(data.frame(findOverlaps(rg$tu,tu_red)))
-  # fodt[,cnt:=.N,by=subjectHits]
-  # rg$tu[fodt[cnt>1,queryHits],]
-  # tu_red[fodt[cnt>1,subjectHits],]
-  # tsv <- '/media/tommy/cache/exp_out/ating/polyASeqs/04_AnnoApa/output/overlapped_tu.tsv'
-  # fwrite(file=tsv,data.table(data.frame(rg$tu[fodt[cnt>1,queryHits],])),sep="\t",quote=FALSE,row.names=FALSE)
-
 
         fo_tu <- data.table(as.data.frame(findOverlaps(peaks,rg$tu)))
         fo_flank <- data.table(as.data.frame(findOverlaps(peaks,rg$flank)))
@@ -216,8 +206,6 @@ joinTus_peaks<- function(allpeaks,rg)
         fo_flank$coding <- rg$flank[fo_flank$subjectHits]$coding
         cat('Assigning TU anno from flank \n')
         fo_flank$tu_anno <- rg$flank[fo_flank$subjectHits]$tu_anno
-     
-
 
      # Remove cases where same PR links to same TU and flank of that TU
         fo_flank$key <- paste0(fo_flank$queryHits,"+",fo_flank$tu)
@@ -231,27 +219,13 @@ joinTus_peaks<- function(allpeaks,rg)
         # Join table that links each PR to a TU/flank
         cat('Create data table \n')
         join <- data.table(peak=peaks[ov$queryHits]$peakID,tu=ov$tu,tu_anno=ov$tu_anno, type=ov$set,coding=ov$coding)
-
-        # Count table for listing the contingencies
-        #agg <- join[,list(nTu=length(tu[type=="tu"]),nFlank=length(tu[type=="flank"])),by="peak"]
         
        # Reduced assignment table that assigns the uniques
         join <- join[,list(tu=tu,tu_anno=tu_anno,type=type,coding=coding,unique_peak=length(tu)==1,over_tus=toString(tu[type=="tu"]),flank_tus=toString(tu[type=="flank"])),by="peak"]
 
         join <- join[,list(peak=peak,type=type,coding=coding,unique_peak=unique_peak,unique_tu=all(unique_peak),over_tus=over_tus,flank_tus=flank_tus,tu_anno=tu_anno),by="tu"]
 
-    #summary <- data.frame(group="intergenic",n=length(peaks)-nrow(agg),stringsAsFactors=FALSE)
-     #   summary <- rbind(summary,data.frame(group="unique_tu",n=sum((agg$nTu==1)&(agg$nFlank==0))))
-     #   summary <- rbind(summary,data.frame(group="unique_flank",n=sum((agg$nTu==0)&(agg$nFlank==1))))
-     #   summary <- rbind(summary,data.frame(group="multi_tu",n=sum((agg$nTu>1)&(agg$nFlank==0))))
-     #   summary <- rbind(summary,data.frame(group="multi_flank",n=sum((agg$nTu==0)&(agg$nFlank>1))))
-     #   summary <- rbind(summary,data.frame(group="unique_tu_multi_flank",n=sum((agg$nTu==1)&(agg$nFlank>0))))
-     #   summary <- rbind(summary,data.frame(group="multi_tu_multi_flank",n=sum((agg$nTu>1)&(agg$nFlank>0))))
-     #   summary$frac <- summary$n/sum(summary$n)
-     #   stopifnot(sum(summary$n)==length(peaks))
-
-        #ret <-list(allpeaks=allpeaks,polya_peaks=peaks,join=join,agg=agg,summary=summary)
-        
+            
         ret <-list(allpeaks=allpeaks,polya_peaks=peaks,join=join)
        return(ret)
 }
