@@ -31,7 +31,8 @@ dir='/home/sonas/beegfs/APA/scPASU/'
 peaks_ref_dir='/home/sonas/beegfs/APA/scPASU/output/3_RefinePeakRef/3a_assign_TU/e'${extn}'/'
 file_prefix='u10_uro'
 gtf_file='/home/sonas/beegfs/ref/refdata-gex-GRCh38-2020-A/genes/genes.gtf'
+out_dir=${dir}'output/3_RefinePeakRef/3a_assign_TU/'
 
 
-Rscript ${dir}/scripts/2_assign_tu.R 30 ${dir} ${peaks_ref_dir} ${file_prefix} ${gtf_file}
+Rscript ${dir}/scripts/2_assign_tu.R 30 ${dir} ${peaks_ref_dir} ${file_prefix} ${out_dir} ${gtf_file}
 
