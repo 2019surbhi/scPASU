@@ -103,3 +103,9 @@ fprefix3=${fprefix_final}_tu_assigned
 
 Rscript ${script_dir}3a_assign_tu.R ${cores} ${dir} ${peak_ref_dir} ${fprefix3} ${out3} ${gtf_file} ${ref4}
 
+# Also create bed file for UCSC uploads
+
+ref5=${out3}${fprefix_final}_peak_universe_updated.txt
+Rscript ${script_dir}create_bed_file.R ${ref5} ${out3} ${fprefix_final}
+
+
