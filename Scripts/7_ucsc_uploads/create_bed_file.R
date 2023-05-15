@@ -14,7 +14,7 @@ fprefix=args[3]
 ref<-fread(ref_file)
 ref<-as.data.frame(ref)
 
-cols<-c('chr','start','end','peakID')
+cols<-c('chr','start','end','final_annotation')
 bed<-ref[,cols]
 bed$score<-rep(0,nrow(bed))
 bed$strand<-ref$strand
