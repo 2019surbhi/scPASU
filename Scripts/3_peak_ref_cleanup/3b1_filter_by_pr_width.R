@@ -7,9 +7,9 @@ args <- commandArgs(trailing = TRUE)
 
 
 ref_file=args[1]
-out=args[3]
-frefix=args[4]
-max_width=as.numeric(args[5])
+out=args[2]
+frefix=args[3]
+max_width=as.numeric(args[4])
 
 # HPC paths
 
