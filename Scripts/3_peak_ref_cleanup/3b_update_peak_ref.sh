@@ -78,7 +78,7 @@ y=5000
 
 Rscript ${script_dir}3b2_plot_peak_cov.R ${pcov_file} ${out2} ${fprefix} ${w} ${h} ${x} ${y}
 
-# 3. Filter peak ref
+# 3a. Filter peak ref
 echo filter peak ref
 
 out3=${outdir}'3d_final_ref/'
@@ -89,5 +89,17 @@ min_cov=10
 fprefix_final=${fprefix}_final
 pcov_file=${out2}${fprefix}_peak_count_updated.rds
 
-Rscript ${script_dir}3b3_filter_by_peak_cov.R ${ref333} ${pcov_file} ${out3} ${fprefix_final} ${min_cov}
+Rscript ${script_dir}3b3_filter_by_peak_cov.R ${ref3} ${pcov_file} ${out3} ${fprefix_final} ${min_cov}
+
+
+# 3b. assign TU
+
+echo  3rd TU assignment
+
+dir='/home/sonas/beegfs/APA/scPASU/'
+peak_ref_dir='none'
+ref4=${out3}${fprefix}_final_cov_filtered_peak_ref.txt
+fprefix3=${fprefix_final}_tu_assigned
+
+Rscript ${script_dir}3a_assign_tu.R ${ncore} ${dir} ${peak_ref_dir} ${fprefix3} ${out3} ${gtf_file} ${ref4}
 
