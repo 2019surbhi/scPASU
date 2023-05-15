@@ -2,12 +2,12 @@
 
 #SBATCH --mail-type=END
 #SBATCH --mail-user=sonas@ccf.org
-#SBATCH --job-name=peak_cov
+#SBATCH --job-name=update_peak_ref
 #SBATCH -n 30
 #SBATCH --mem-per-cpu=3900
 
-#SBATCH -o peak_cov_%J.out
-#SBATCH -e peak_cov_%J.err
+#SBATCH -o update_peak_ref_%J.out
+#SBATCH -e update_peak_ref_%J.err
 
 module load R/4.1.0
 
@@ -23,11 +23,12 @@ cores=30
 bam_dir='/home/sonas/beegfs/APA/scPASU/output/1_process_bam/1e_merged_bam/'
 bam=${bam_dir}dedup_u10_uro_clean_filtered2_2_merged.bam
 
+fprefix=u10_uro
+
 ref_dir='/home/sonas/beegfs/APA/scPASU/output/3_RefinePeakRef/3a_assign_TU/'
-ref_saf=${ref_dir}u10_uro_filtered_100_peak_universe_updated.saf
+ref_saf=${ref_dir}${fprefix}_peak_universe_updated.saf
 
 outdir='/home/sonas/beegfs/APA/scPASU/output/3_RefinePeakRef/3b_PeakCoverage/'
-fprefix=u10_uro
 
 script_dir='/home/sonas/beegfs/APA/scPASU/scripts/'
 
