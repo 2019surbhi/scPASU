@@ -101,5 +101,5 @@ peak_ref_dir='none'
 ref4=${out3}${fprefix}_final_cov_filtered_peak_ref.txt
 fprefix3=${fprefix_final}_tu_assigned
 
-Rscript ${script_dir}3a_assign_tu.R ${ncore} ${dir} ${peak_ref_dir} ${fprefix3} ${out3} ${gtf_file} ${ref4}
+Rscript ${script_dir}3a_assign_tu.R ${cores} ${dir} ${peak_ref_dir} ${fprefix3} ${out3} ${gtf_file} ${ref4}
 
