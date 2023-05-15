@@ -89,7 +89,11 @@ if(file.exists(peaks_file))
 {
 
 merged<-fread(peaks_file)
-
+if(!('polya' %in% colnames(merged)))
+ {
+  merged$polya<-rep('polya',nrow(merged))
+  }
+colnames(merged)<-gsub('peak','peakID',colnames(merged))
 }else{
 
 save_saf<-'yes'
@@ -154,7 +158,14 @@ cat('Add other relevant cols \n')
 jtu$join<-as.data.frame(jtu$join)
 # Remove multi-TU peaks
 r1<-which(jtu$join$unique_peak==FALSE)
-tu_tab<-jtu$join[-r1,] 
+
+if(length(r1)!=0)
+{
+ tu_tab<-jtu$join[-r1,] 
+ }else{
+ tu_tab<-jtu$join
+ }
+ 
 #r2<-which(jtu$join$unique_tu==FALSE)
 #tu_tab<-jtu$join[-r2,] 
 
@@ -189,7 +200,7 @@ tu_tab$pr_end<-matched_peaks$pr_end
 tu_tab$pr_strand<-matched_peaks$pr_strand
 tu_tab$pr_width<-matched_peaks$pr_width
 tu_tab$polya_count<-matched_peaks$polya_count
-tu_tab$polya_count<-matched_peaks$peakID
+tu_tab$peakID<-matched_peaks$peakID
 
 # Now add peakID to tu annotation column (multi peak TU will look like TU1:gene:P1, TU1:gene:P2 and TU1:gene:P3 while single peak TU will look like TU2:gene:P0)
 
@@ -229,8 +240,6 @@ merged_tu3<-merged_tu3 %>% as.data.frame()
 write.table(merged_tu3,paste0(outdir,fprefix,'_peak_universe_updated.txt'),sep='\t',row.names=FALSE,col.names=TRUE)
 
 
-if(save_saf=='yes')
-{
 # Create SAF format peak ref too
 
 # Select relevant columns
@@ -242,4 +251,3 @@ colnames(saf_ref)<-c('GeneID','Chr','Start','End','Strand')
 cat('Creating SAF ref file \n')
 write.table(saf_ref,paste0(outdir,fprefix,'_peak_universe_updated.saf'),sep='\t',quote=FALSE,row.names=FALSE)
 
-}
