@@ -7,7 +7,7 @@ args <- commandArgs(trailing = TRUE)
 
 
 ref_file=args[1]
-cov_mat_file[2]
+cov_mat_file=args[2]
 out=args[3]
 frefix=args[4]
 mincov=as.numeric(args[5])
