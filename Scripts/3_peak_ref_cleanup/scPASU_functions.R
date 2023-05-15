@@ -233,23 +233,26 @@ joinTus_peaks<- function(allpeaks,rg)
         join <- data.table(peak=peaks[ov$queryHits]$peakID,tu=ov$tu,tu_anno=ov$tu_anno, type=ov$set,coding=ov$coding)
 
         # Count table for listing the contingencies
-        agg <- join[,list(nTu=length(tu[type=="tu"]),nFlank=length(tu[type=="flank"])),by="peak"]
+        #agg <- join[,list(nTu=length(tu[type=="tu"]),nFlank=length(tu[type=="flank"])),by="peak"]
+        
        # Reduced assignment table that assigns the uniques
         join <- join[,list(tu=tu,tu_anno=tu_anno,type=type,coding=coding,unique_peak=length(tu)==1,over_tus=toString(tu[type=="tu"]),flank_tus=toString(tu[type=="flank"])),by="peak"]
 
         join <- join[,list(peak=peak,type=type,coding=coding,unique_peak=unique_peak,unique_tu=all(unique_peak),over_tus=over_tus,flank_tus=flank_tus,tu_anno=tu_anno),by="tu"]
 
-    summary <- data.frame(group="intergenic",n=length(peaks)-nrow(agg),stringsAsFactors=FALSE)
-        summary <- rbind(summary,data.frame(group="unique_tu",n=sum((agg$nTu==1)&(agg$nFlank==0))))
-        summary <- rbind(summary,data.frame(group="unique_flank",n=sum((agg$nTu==0)&(agg$nFlank==1))))
-        summary <- rbind(summary,data.frame(group="multi_tu",n=sum((agg$nTu>1)&(agg$nFlank==0))))
-        summary <- rbind(summary,data.frame(group="multi_flank",n=sum((agg$nTu==0)&(agg$nFlank>1))))
-        summary <- rbind(summary,data.frame(group="unique_tu_multi_flank",n=sum((agg$nTu==1)&(agg$nFlank>0))))
-        summary <- rbind(summary,data.frame(group="multi_tu_multi_flank",n=sum((agg$nTu>1)&(agg$nFlank>0))))
-        summary$frac <- summary$n/sum(summary$n)
-        stopifnot(sum(summary$n)==length(peaks))
+    #summary <- data.frame(group="intergenic",n=length(peaks)-nrow(agg),stringsAsFactors=FALSE)
+     #   summary <- rbind(summary,data.frame(group="unique_tu",n=sum((agg$nTu==1)&(agg$nFlank==0))))
+     #   summary <- rbind(summary,data.frame(group="unique_flank",n=sum((agg$nTu==0)&(agg$nFlank==1))))
+     #   summary <- rbind(summary,data.frame(group="multi_tu",n=sum((agg$nTu>1)&(agg$nFlank==0))))
+     #   summary <- rbind(summary,data.frame(group="multi_flank",n=sum((agg$nTu==0)&(agg$nFlank>1))))
+     #   summary <- rbind(summary,data.frame(group="unique_tu_multi_flank",n=sum((agg$nTu==1)&(agg$nFlank>0))))
+     #   summary <- rbind(summary,data.frame(group="multi_tu_multi_flank",n=sum((agg$nTu>1)&(agg$nFlank>0))))
+     #   summary$frac <- summary$n/sum(summary$n)
+     #   stopifnot(sum(summary$n)==length(peaks))
 
-        ret <-list(allpeaks=allpeaks,polya_peaks=peaks,join=join,agg=agg,summary=summary)
+        #ret <-list(allpeaks=allpeaks,polya_peaks=peaks,join=join,agg=agg,summary=summary)
+        
+        ret <-list(allpeaks=allpeaks,polya_peaks=peaks,join=join)
        return(ret)
 }
 #### Modified functions from () ###
