@@ -105,7 +105,7 @@ Rscript ${script_dir}3a_assign_tu.R ${cores} ${dir} ${peak_ref_dir} ${fprefix3} 
 
 # Also create bed file for UCSC uploads
 
-ref5=${out3}${fprefix_final}_peak_universe_updated.txt
+ref5=${out3}${fprefix3}_peak_universe_updated.txt
 Rscript ${script_dir}create_bed_file.R ${ref5} ${out3} ${fprefix_final}
 
 
