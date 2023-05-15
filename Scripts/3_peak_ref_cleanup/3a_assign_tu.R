@@ -13,26 +13,24 @@ dir=argv[2] # path to scPASU dir where inputs and outputs are organized
 peaks_dir=argv[3] # path to final peaks ref dir 
 fprefix=argv[4] # file prefix
 gtf_file=argv[5] # gtf file with full path
+peaks_file=argv[6] # Enter peaks ref directly
+
+
+# HPC paths
+#dir<-'/home/sonas/beegfs//APA/scPASU/'
+#gtf_file<-"/home/sonas/beegfs/ref/refdata-gex-GRCh38-2020-A/genes/genes.gtf"
 
 script_dir<-paste0(dir,'/scripts/')
 source(paste0(script_dir,'/scPASU_functions.R'))
 
-outdir<-paste0(dir,/output/3_RefinePeakRef/3a_assign_TU/')
+outdir<-paste0(dir,'/output/3_RefinePeakRef/3a_assign_TU/')
 inputdir<-paste0(dir,'/input/')
-
-# HPC paths
-#dir<-'/home/sonas/beegfs/APA/scPASU/input/'
-#genedir<-'/home/sonas/beegfs/APA/scPASU/input/'
-#genedir<-'/home/sonas/beegfs/APA/scAPA/ureter10/Archive/assign_tu'
-#gtf_file<-"/home/sonas/beegfs/ref/refdata-gex-GRCh38-2020-A/genes/genes.gtf"
-
 
 ensembl_biotype_table<-paste0(inputdir,"GRCh38_gene_biotypes.csv")
 genes_file<-paste0(inputdir,"/genes.rds")
 output_file<-paste0(outdir,"/",fprefix,"_jtu.rds")
 track_dir<-paste0(outdir,"/tracks/")
 cache_dir<-paste0(outdir,"/tmp/")
-#input_file<-paste0(dir,"/bam_path.csv")
 
 chrs <- handy::chrs()
 dist <- 10
@@ -87,6 +85,14 @@ save(red_ens,file=genes_file)
 }
 
 ## Peaks file ##
+if(file.exists(peaks_file))
+{
+
+merged<-fread(peaks_file)
+
+}else{
+
+save_saf<-'yes'
 
 peaks_dir_m=paste0(peaks_dir,'/minus/4_polya_supported_peak_ref/')
 peaks_dir_p=paste0(peaks_dir,'/plus/4_polya_supported_peak_ref/')
@@ -125,11 +131,12 @@ colnames(merged)<-gsub('\\bpeak_strand\\b','strand',colnames(merged))
 cat('Saving table \n')
 write.table(merged,paste0(outdir,fprefix,'_peak_universe.txt'),sep='\t',row.names=FALSE,col.names=TRUE)
 
-#convert to GRange
-
-# Read in the data file
-
 #merged<- read.table('/u10_uro_peak_universe.txt', sep='\t',header=TRUE)
+
+}
+
+
+#convert to GRange
 
 cat('Creating GRange obj \n')
 peaks<-makeGRanges(merged,strand=T)
@@ -222,17 +229,8 @@ merged_tu3<-merged_tu3 %>% as.data.frame()
 write.table(merged_tu3,paste0(outdir,fprefix,'_peak_universe_updated.txt'),sep='\t',row.names=FALSE,col.names=TRUE)
 
 
-
-
-# Also save a strand specific .saf
-saf_ref_m<-saf_ref[saf_ref$Strand=='-',]
-saf_ref_p<-saf_ref[saf_ref$Strand=='+',]
-
-write.table(saf_ref_m,paste0(outdir,fprefix,'_peak_universe_minus_updated.saf'),sep='\t',quote=FALSE,row.names=FALSE)
-write.table(saf_ref_p,paste0(outdir,fprefix,'_peak_universe_plus_updated.saf'),sep='\t',quote=FALSE,row.names=FALSE)
-
-
-
+if(save_saf=='yes')
+{
 # Create SAF format peak ref too
 
 # Select relevant columns
@@ -244,3 +242,4 @@ colnames(saf_ref)<-c('GeneID','Chr','Start','End','Strand')
 cat('Creating SAF ref file \n')
 write.table(saf_ref,paste0(outdir,fprefix,'_peak_universe_updated.saf'),sep='\t',quote=FALSE,row.names=FALSE)
 
+}
