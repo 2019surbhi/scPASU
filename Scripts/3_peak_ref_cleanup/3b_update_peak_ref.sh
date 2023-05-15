@@ -32,7 +32,7 @@ maxwidth=1000
 out1=${outdir}3b_Filter_by_PR_width/
 mkdir -p ${out1}
 
-Rscript ${script_dir}3b1_filter_by_pr_width.R ${ref} ${out1} ${fprefix} ${maxwidth}
+Rscript ${script_dir}3b_filter_by_pr_width.R ${ref} ${out1} ${fprefix} ${maxwidth}
 
 # 1b. Assign TU - to update peak ref
 
@@ -64,7 +64,7 @@ echo get peak coverage
 counts_file=${out2}${fprefix}_peak_count.rds
 ref3=${out1}${fprefix2}_peak_universe_updated.txt
 
-Rscript ${script_dir}3b2_peaks_coverage.R ${ref3} ${counts_file} ${out2}
+Rscript ${script_dir}3b1_peaks_coverage.R ${ref3} ${counts_file} ${out2}
 
 # 2c.  Plot peak coverage percent
 
@@ -81,9 +81,13 @@ Rscript ${script_dir}3b2_plot_peak_cov.R ${pcov_file} ${out2} ${fprefix} ${w} ${
 # 3. Filter peak count mat
 echo filter peak ref
 
-min_cov=10
-out='/home/sonas/beegfs/APA/scPASU/output/3_RefinePeakRef/3c_updated_peaks/'
-fprefix=u10_uro_filtered_100
+out3=${outdir}'3d_final_ref/'
+mkdir -p ${out3}
 
-Rscript ${script_dir}3b_filter_peak_ref.R ${ref} ${pcov_file} ${out} ${fprefix} ${min_cov} ${is_minus}
+min_cov=10
+
+fprefix_final=${fprefix}_final
+pcov_file=${out2}${fprefix}_peak_count_updated.rds
+
+Rscript ${script_dir}3c_filter_by_peak_cov.R ${ref} ${pcov_file} ${out} ${fprefix} ${min_cov} ${is_minus}
 
