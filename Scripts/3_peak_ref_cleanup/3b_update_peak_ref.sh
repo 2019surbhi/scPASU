@@ -78,7 +78,7 @@ y=5000
 
 Rscript ${script_dir}3b2_plot_peak_cov.R ${pcov_file} ${out2} ${fprefix} ${w} ${h} ${x} ${y}
 
-# 3. Filter peak count mat
+# 3. Filter peak ref
 echo filter peak ref
 
 out3=${outdir}'3d_final_ref/'
@@ -89,5 +89,5 @@ min_cov=10
 fprefix_final=${fprefix}_final
 pcov_file=${out2}${fprefix}_peak_count_updated.rds
 
-Rscript ${script_dir}3c_filter_by_peak_cov.R ${ref} ${pcov_file} ${out} ${fprefix} ${min_cov} ${is_minus}
+Rscript ${script_dir}3b3_filter_by_peak_cov.R ${ref333} ${pcov_file} ${out3} ${fprefix_final} ${min_cov}
 
