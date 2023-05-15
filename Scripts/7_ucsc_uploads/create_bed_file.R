@@ -8,7 +8,7 @@ args <- commandArgs(trailing = TRUE)
 
 ref_file=args[1]
 out=args[2]
-frefix=args[3]
+fprefix=args[3]
 
 
 ref<-fread(ref_file)
