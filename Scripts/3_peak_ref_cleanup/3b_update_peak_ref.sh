@@ -16,8 +16,8 @@ module load R/4.1.0
 #strand='minus'
 #is_minus='TRUE'
 
-strand='plus'
-is_minus='FALSE'
+#strand='plus'
+#is_minus='FALSE'
 
 cores=30
 bam_dir='/home/sonas/beegfs/APA/scPASU/output/1_process_bam/1e_merged_bam/'
@@ -27,7 +27,7 @@ ref_dir='/home/sonas/beegfs/APA/scPASU/output/3_RefinePeakRef/3a_assign_TU/'
 ref_saf=${ref_dir}u10_uro_filtered_100_peak_universe_updated.saf
 
 outdir='/home/sonas/beegfs/APA/scPASU/output/3_RefinePeakRef/3b_PeakCoverage/'
-fprefix=u10_uro_filtered_100
+fprefix=u10_uro
 
 script_dir='/home/sonas/beegfs/APA/scPASU/scripts/'
 
