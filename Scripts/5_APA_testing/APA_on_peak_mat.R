@@ -18,25 +18,6 @@ library(corrplot)
 source('/home/sonas/Archive/scripts/final_scripts/scPASU_APA_testing_functions.R')
 
 
-count_dir<-'/home/sonas/APA/output/4_APA/inputs/counts_mat_dir/'
-
-f<-list.files(count_dir,full.names = TRUE)
-peak_counts<-lapply(f,read.table,sep='\t', header=TRUE,stringsAsFactors=FALSE)
-
-
-# Replace . with - in count mat 
-for(i in 1:length(peak_counts))
-{
-  colnames(peak_counts[[i]])<-gsub('.','-',colnames(peak_counts[[i]]),fixed = TRUE)
-  colnames(peak_counts[[i]])<-gsub('uro_','',colnames(peak_counts[[i]]))
-}
-
-# Merge counts
-merged_counts<-do.call(cbind,peak_counts)
-
-write.table(merged_counts,paste0('/home/sonas/APA/output/4_APA/inputs/u10_peak_counts.txt'),sep='\t')
-
-
 # User inputs
 
 #inputdir<-'/home/sonas/thesis_figures/ch4/APA/input/'
