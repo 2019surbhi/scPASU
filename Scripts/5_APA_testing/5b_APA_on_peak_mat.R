@@ -3,9 +3,13 @@
 library(dplyr)
 library(stringi)
 library(stringr)
+library(readxl)
+library(openxlsx)
 library(data.table)
 library(matrixStats)
 library(gtools)
+
+
 
 library(ggplot2)
 library(reshape)
@@ -15,6 +19,7 @@ library(GenomicRanges)
 library(BSgenome.Hsapiens.UCSC.hg38)
 library(edgeR)
 library(DEXSeq)
+library(rtracklayer)
 library(corrplot)
 
 source('scPASU_APA_testing_functions.R')
@@ -31,11 +36,11 @@ peak_ref_file=argv[5] # peak file name with full path
 
 # paths on HPC #
 
-inputdir<-'/home/sonas/beegfs/APA/scPASU/output/5_APA_testing/inputs/'
-outdir<-'/home/sonas/beegfs/APA/scPASU/output/5_APA_testing/outputs/'
-counts_file<-'u10_uro_counts.txt'
-meta_file<-'2021_04_01_ureter10_uro_PC50_res0.2_meta.xlsx'
-peak_ref_file<-'/home/sonas/beegfs/APA/scPASU/output/5_APA_testing/inputs/u10_uro_APA_testing_peak_ref.txt'
+#inputdir<-'/home/sonas/beegfs/APA/scPASU/output/5_APA_testing/inputs/'
+#outdir<-'/home/sonas/beegfs/APA/scPASU/output/5_APA_testing/outputs/'
+#counts_file<-'u10_uro_counts.txt'
+#meta_file<-'2021_04_01_ureter10_uro_PC50_res0.2_meta.xlsx'
+#peak_ref_file<-'/home/sonas/beegfs/APA/scPASU/output/5_APA_testing/inputs/u10_uro_APA_testing_peak_ref.txt'
 
 # Read merged counts
 merged_counts<-read.table(paste0(inputdir,counts_file),sep='\t')
@@ -54,78 +59,21 @@ col<-which(colnames(peak_ref)=='final_annotation')
 peak_ref$peak<-peak_ref[,col]
 peak_ref<-peak_ref[,-col]
 
-# Remove P0 peaks
-plist<-strsplit(peak_ref$peak,split=':')
-tlist<-sapply(plist,'[',3)
-rem<-which(tlist=='P0') # 4205 P0 peaks
+## Remove P0 peaks ##
+plist<-strsplit(peak_ref$peak,split=':') %>% sapply(.,'[[',3)
+rem<-which(tlist=='P0') # 8066 P0 peaks
 peak_ref<-peak_ref[-rem,]
  
-
-# Update peak ref to remove majority exon peak genes
-
-# using bedops extract exon on HPC from https://bioinformatics.stackexchange.com/questions/18706/extract-only-exon-regions-from-gff-gtf-file-with-input-bed-regions
-
-# gtf2bed < annotations.gtf | grep -wF exon > exons.bed
-
-# OR use rtracklayer
-library(rtracklayer)
-library(Sierra)
-
-gtf<-import('/home/sonas/APA/ref/genes.gtf')
-exon   = subset(gtf, type=='exon')
-peak_gr<-GRanges(peak_ref)
-
-ov<-GenomicAlignments::findOverlaps(peak_gr, exon,type="within")
-idx<-S4Vectors::queryHits(ov)
-
-exon<-rep('other',nrow(peak_ref))
-exon[idx]<-'exon'
-peak_ref$exon<-exon
-
-
-exon_count<-peak_ref %>% group_by(gene, exon) %>% tally()
-
-# Retain only exon count
-exon_count<-exon_count[which(exon_count$exon=='exon'),]
-
-peak_count<-peak_ref %>% group_by(gene) %>% tally()
-ecount<-rep(0,nrow(peak_count))
-idx<-match(exon_count$gene,peak_count$gene)
-ecount[idx]<-exon_count$n
-peak_count$exon_count<-ecount
-peak_count$exon_pct<-(peak_count$exon_count/peak_count$n)*100
-peak_count<-peak_count[order(peak_count$exon_pct,decreasing = TRUE),]
-  
-write.xlsx(peak_count,'/home/sonas/APA/output/4_APA/outputs/ref_update/peak_exon_count.xlsx')
-
-#### Archive ####
-gtf_df<-as.data.frame(gtf)
-exon<-gtf_df[which(gtf_df$type=='exon'),]
-
-# Get chr,start,end,gene name, score and strand
-exon_bed<-exon[,c(1,2,3,13,8,5)]
-exon_bed$score<-rep(0,nrow(exon_bed))
-write.table(x=exon_bed,file='exon.bed',col.names=FALSE,row.names=FALSE,quote=FALSE,sep='\t')
-
-############# #######################
-
-
-#rep_dir<-'/home/sonas/thesis_figures/ch4/data_partition/rep_dir/'
-
 # Read sample and comparison tables #
 
 comp_file<-paste0(inputdir,'comp_group.csv')
 compdt <- fread(comp_file,header=TRUE)
 comps <- data.table(a=compdt$group1,b=compdt$group2)
-bc<-comps
 
-# 5 at a time - run 26 and 28
-comps<-comps[c(27,26),]
+# if the run fails run 5 or 10 comparisons at at a time
+#bc<-comps
+#comps<-comps[1:5,]
 
-# Do it only for 2 comparison
-#comps<-comps[c(14,15),]
-# check for old comp 1st
-#comps<-data.table("a"=c('b3','u4'),"b"=c('b2','b2'))
 compnames <- paste0(comps$a,"_vs_",comps$b)
 
 # Create stab
@@ -136,17 +84,12 @@ group<-rep(group,2)
 n<-length(group)/2
 stab<-cbind(sample,group) %>% as.data.frame()
 
-#samp<-fread('/home/sonas/APA/scAPA/sample_sheet.csv')
-#samp<-fread('/home/sonas/APA/scAPA/sample_sheet2.csv')
-
 stab$group<- stab$group %>% as.factor()
 
 cov<-10
-#a<-'u4'
 a<-comps$a
 b<-comps$b
-# a<-'b3'
-# b<-'b2'
+
 min_peak<-1
 #adjust.var<-'batch'
 ncpu<-20
