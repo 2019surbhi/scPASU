@@ -1,5 +1,6 @@
 #!/usr/bin/env Rscript
 
+library(data.table)
 library(dplyr)
 
 argv<-commandArgs(trailing = TRUE)
@@ -11,7 +12,7 @@ out=argv[3]
 count_dir<-'/home/sonas/APA/output/4_APA/inputs/counts_mat_dir/'
 
 f<-list.files(count_dir,full.names = TRUE)
-peak_counts<-lapply(f,read.table,sep='\t', header=TRUE,stringsAsFactors=FALSE)
+peak_counts<-lapply(f,fread)
 
 
 # Replace . with - in count mat 
