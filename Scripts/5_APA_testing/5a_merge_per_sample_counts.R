@@ -9,10 +9,9 @@ counts_dir=argv[1]
 fprefix=argv[2] 
 out=argv[3]
 
-counts_dir<-'/home/sonas/APA/output/4_APA/inputs/counts_mat_dir/'
 
 f<-list.files(counts_dir,full.names = TRUE)
-peak_counts<-lapply(f,fread)
+peak_counts<-lapply(f,read.table,header=TRUE,sep='\t')
 
 
 # Replace . with - in count mat 
