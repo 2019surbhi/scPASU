@@ -5,13 +5,13 @@ library(dplyr)
 
 argv<-commandArgs(trailing = TRUE)
 
-count_dir=argv[1]
+counts_dir=argv[1]
 fprefix=argv[2] 
 out=argv[3]
 
-count_dir<-'/home/sonas/APA/output/4_APA/inputs/counts_mat_dir/'
+counts_dir<-'/home/sonas/APA/output/4_APA/inputs/counts_mat_dir/'
 
-f<-list.files(count_dir,full.names = TRUE)
+f<-list.files(counts_dir,full.names = TRUE)
 peak_counts<-lapply(f,fread)
 
 
