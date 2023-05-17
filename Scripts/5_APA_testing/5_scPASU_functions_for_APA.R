@@ -70,7 +70,7 @@ create_apa_inputs<-function(merged_counts,meta,c1,c2,c1_nm,c2_nm,out,plot_corr=F
   
   if(plot_corr==TRUE)
   {
-    
+    options(bitmapType='cairo')
     png(paste0(out,c1_nm,'_',c2_nm,'_correlation.png'),
         width = 8,height=8, units="in",res = 300)
     
