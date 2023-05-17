@@ -61,7 +61,7 @@ peak_ref<-peak_ref[,-col]
 
 ## Remove P0 peaks ##
 plist<-strsplit(peak_ref$peak,split=':') %>% sapply(.,'[[',3)
-rem<-which(tlist=='P0') # 8066 P0 peaks
+rem<-which(plist=='P0') # 8066 P0 peaks
 peak_ref<-peak_ref[-rem,]
  
 # Read sample and comparison tables #
