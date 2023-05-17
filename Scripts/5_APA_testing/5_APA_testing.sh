@@ -24,6 +24,17 @@ out='/home/sonas/beegfs/APA/scPASU/output/5_APA_testing/inputs/'
 
 Rscript ${script_dir}5a_merge_per_sample_counts.R ${counts_dir} ${fprefix} ${out}
 
+### 2. APA testing ###
+
+inputdir='/home/sonas/beegfs/APA/scPASU/output/5_APA_testing/inputs/'
+outdir='/home/sonas/beegfs/APA/scPASU/output/5_APA_testing/outputs/'
+counts_file='u10_uro_counts.txt'
+meta_file='2021_04_01_ureter10_uro_PC50_res0.2_meta.xlsx'
+peak_ref_file='/home/sonas/beegfs/APA/scPASU/output/5_APA_testing/inputs/u10_uro_APA_testing_peak_ref.txt'
+
+mkdir -p outdir
+
+Rscript ${script_dir}5_APA_testing_on_peak_mat.R ${inputdir} ${outdir} ${counts_file} ${meta_file} ${peak_ref_file}
 
 
 
