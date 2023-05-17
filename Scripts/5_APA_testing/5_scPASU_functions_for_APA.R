@@ -27,14 +27,31 @@ library(corrplot)
 # c1 & c2: seurat clusters identity for 1st and 2nd clusters
 # c1_nm & c2_nm: cluster names (this should match their names in sample sheet)
 
-create_apa_inputs2<-function(merged_counts,meta,c1,c2,c1_nm,c2_nm,out,plot_corr=FALSE)
+create_apa_inputs<-function(merged_counts,meta,c1,c2,c1_nm,c2_nm,out,plot_corr=FALSE)
 {
   
   # Create subset peak matrix for each cluster
   c1_peaks<-subset_peaks_by_clus(c1,merged_counts,meta)
   c2_peaks<-subset_peaks_by_clus(c2,merged_counts,meta)
   
+  # Filter peaks/rows that have 0 counts in <10% cells in the cluster
+
+  min_cell_exp_rows<-function(peak_mat,cutoff=10)
+  {
+  n<-ncol(peak_mat)
+  rsum<-rowSums(peak_mat)
+  min_cell<-((cutoff/100)*n) %>% round()
+  r<-rownames(peak_mat)[which(rsum>=min_cell)]
+  return(r)
+  }
   
+  r1<-min_cell_exp_rows(c1_peaks)
+  r2<-min_cell_exp_rows(c2_peaks)
+  r<-c(r1,r2) %>% unique()
+  
+  c1_peaks<-c1_peaks[match(r,rownames(c1_peaks)),]
+  c2_peaks<-c2_peaks[match(r,rownames(c2_peaks)),]
+
   # Create replicates # - adapt for more than 2 replicates?
   c1_rep_lst<-create_replicates(bc_dir,clus_name=c1_nm,peak_clus_mat=c1_peaks,nrep=2)
   c1_mat<-do.call(cbind,c1_rep_lst)
