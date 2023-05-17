@@ -1,0 +1,30 @@
+#!/usr/bin/env Rscript
+
+### This script filters the peak ref to remove non-unique TUs for APA testing ###
+
+argv<-commandArgs(trailing = TRUE)
+
+peak_ref_file=argv[1] # full path to dir where merged count matrix is saved
+peak_ref_file=argv[2] # final peak ref file after 3rd TU assignment
+tu_file=argv[3] # tu table where unique_tu col = FALSE
+fprefix=argv[4]
+out=argv[5]
+
+
+# HPC paths #
+peak_ref_file<-'/home/sonas/beegfs/APA/scPASU/output/3_RefinePeakRef/3d_final_ref/u10_uro_final_tu_assigned_peak_universe_updated.txt'
+tu_file<-'/home/sonas/beegfs/APA/scPASU/output/3_RefinePeakRef/3a_assign_TU/non_unique_tu_table.txt'
+fprefix<-'u10_uro'
+out<-'/home/sonas/beegfs/APA/scPASU/output/5_APA/inputs/'
+
+## Read inputs ##\
+peak_ref<-read.table(peak_ref_file,header=TRUE,sep='\t')
+tu_tab<-read.table(tu_file,header=TRUE,sep='\t')
+
+# Select abbiguous TU
+tu<-tu_tab$tu %>% unique()
+
+# Remove those TUs from APA testing reference
+ref<-peak_ref[!(peak_ref$tu %in% tu),]
+
+write.table(ref,paste0(out,fprefix,'_APA_testing_peak_ref.txt'),sep='\t',row.names=FALSE,quote=FALSE)
