@@ -1,3 +1,5 @@
+#!/usr/bin/env Rscript
+
 library(dplyr)
 library(stringi)
 library(stringr)
@@ -15,45 +17,37 @@ library(edgeR)
 library(DEXSeq)
 library(corrplot)
 
-source('/home/sonas/Archive/scripts/final_scripts/scPASU_APA_testing_functions.R')
-
+source('scPASU_APA_testing_functions.R')
 
 # User inputs
 
-#inputdir<-'/home/sonas/thesis_figures/ch4/APA/input/'
-inputdir<-'/home/sonas/APA/output/4_APA/inputs/'
+argv<-commandArgs(trailing = TRUE)
 
-#outdir<-'/home/sonas/tingalab/Surbhi/PROJECTS_tinglab_drive/APA_Project/scPASU/output/4a_APA/outputs/'
+inputdir=argv[1] # full path to dir where merged count matrix is saved
+outdir=argv[2] # path to output dir
+counts_file=argv[3] # count matrix file name
+meta_file=argv[4] # name of metadata file (saved from Seurat object, or a table which has cell cluster identity assigned to each cell)
+peak_ref_file=argv[5] # peak file name with full path
 
-#outdir<-'/home/sonas/thesis_figures/ch4/APA/test_output/'
-outdir<-'/home/sonas/APA/output/4_APA/outputs/'
+# paths on HPC #
 
-counts_file<-'u10_peak_counts.txt'
+inputdir<-'/home/sonas/beegfs/APA/scPASU/output/5_APA_testing/inputs/'
+outdir<-'/home/sonas/beegfs/APA/scPASU/output/5_APA_testing/outputs/'
+counts_file<-'u10_uro_counts.txt'
+meta_file<-'2021_04_01_ureter10_uro_PC50_res0.2_meta.xlsx'
+peak_ref_file<-'/home/sonas/beegfs/APA/scPASU/output/5_APA_testing/inputs/u10_uro_APA_testing_peak_ref.txt'
 
 # Read merged counts
 merged_counts<-read.table(paste0(inputdir,counts_file),sep='\t')
 colnames(merged_counts)<-gsub('.','-',colnames(merged_counts),fixed=TRUE)
 
-# Read per clus counts
-# f<-list.files('/home/sonas/tingalab/Surbhi/PROJECTS_tinglab_drive/APA_Project/scPASU/output/3_PeakCounts/3c_CreatePeakMat_per_clus/counts_dir/',full.names = TRUE)
-# 
-# nm<-basename(f)
-# nm<-gsub('2021_04_01_ureter10_uro_PC50_res0.2_','',nm)
-# nm<-gsub('_peak_by_cell_count.rds','',nm)
-# counts<-lapply(f,readRDS)
-
-
-# Read meta data
+# Read meta data [save meta data from Seurat object - ensure the set of cells match that of the count matrix]
 meta<-read.xlsx(paste0(inputdir,'2021_04_01_ureter10_uro_PC50_res0.2_meta.xlsx'))
 
-
-### Load results ###
+### Load previous results ###
 
 ## Peak ref is jtu$join and final_annotation is the peak column 
-peak_ref_dir<-'/home/sonas/APA/output/2_PeakRef/tss/'
-peak_file<-paste0(peak_ref_dir,'u10_uro_l300iA10mm3_e100_updated_tss_filt_final.txt')
-
-peak_ref<-read.table(peak_file,header=TRUE)
+peak_ref<-read.table(peak_ref_file,header=TRUE,sep='\t')
 
 # Replace peak name column with final annotation as this is more meaningful name 
 col<-which(colnames(peak_ref)=='final_annotation')
@@ -61,7 +55,6 @@ peak_ref$peak<-peak_ref[,col]
 peak_ref<-peak_ref[,-col]
 
 # Remove P0 peaks
-
 plist<-strsplit(peak_ref$peak,split=':')
 tlist<-sapply(plist,'[',3)
 rem<-which(tlist=='P0') # 4205 P0 peaks
