@@ -120,10 +120,10 @@ dotests <- function(a,b,ncpu=4,min_peak=1,meanmat,peak_mat)
   message("Testing: ",a," vs ",b)
   mycomp <- paste0(a,"_vs_",b)
   # Run without batch correction
-  ta <- testAPA2(stab=stab,meanmat=meanmat,peak_ref=peak_ref,peak_mat=peak_mat,a=a,b=b,adjust.var=NULL,ncpu=ncpu,min_peak=min_peak)
+  ta <- testAPA_sc(stab=stab,meanmat=meanmat,peak_ref=peak_ref,peak_mat=peak_mat,a=a,b=b,adjust.var=NULL,ncpu=ncpu,min_peak=min_peak)
   
   # Run with batch correction
-  # taadj <- testAPA2(stab=stab,meanmat=meanmat,peak_ref=peak_ref,peak_mat=peak_mat,a=a,b=b,adjust.var=adjust.var,ncpu=ncpu,min_peak=min_peak)
+  # taadj <- testAPA_sc(stab=stab,meanmat=meanmat,peak_ref=peak_ref,peak_mat=peak_mat,a=a,b=b,adjust.var=adjust.var,ncpu=ncpu,min_peak=min_peak)
   # list(ta=ta,taadj=taadj)
   
 }
