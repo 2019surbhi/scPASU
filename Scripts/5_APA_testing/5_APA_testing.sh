@@ -27,7 +27,7 @@ Rscript ${script_dir}5a_merge_per_sample_counts.R ${counts_dir} ${fprefix} ${out
 ### 2. APA testing ###
 
 inputdir='/home/sonas/beegfs/APA/scPASU/output/5_APA_testing/inputs/'
-outdir='/home/sonas/beegfs/APA/scPASU/output/5_APA_testing/outputs/'
+outdir='/home/sonas/beegfs/APA/scPASU/output/5_APA_testing/outputs/APA_tables/'
 counts_file='u10_uro_counts.txt'
 meta_file='2021_04_01_ureter10_uro_PC50_res0.2_meta.xlsx'
 peak_ref_file='/home/sonas/beegfs/APA/scPASU/output/5_APA_testing/inputs/u10_uro_APA_testing_peak_ref.txt'
@@ -35,6 +35,11 @@ peak_ref_file='/home/sonas/beegfs/APA/scPASU/output/5_APA_testing/inputs/u10_uro
 mkdir -p outdir
 
 Rscript ${script_dir}5_APA_testing_on_peak_mat.R ${inputdir} ${outdir} ${counts_file} ${meta_file} ${peak_ref_file}
+
+# 1 vs all
+
+outdir='/home/sonas/beegfs/APA/scPASU/output/5_APA_testing/outputs/APA_tables_1vs_all'
+Rscript ${script_dir}5_APA_testing_on_peak_mat_1_vs_all.R ${inputdir} ${outdir} ${counts_file} ${meta_file} ${peak_ref_file}
 
 
 
