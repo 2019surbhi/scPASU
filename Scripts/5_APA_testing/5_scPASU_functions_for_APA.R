@@ -27,8 +27,15 @@ library(corrplot)
 # c1 & c2: seurat clusters identity for 1st and 2nd clusters
 # c1_nm & c2_nm: cluster names (this should match their names in sample sheet)
 
-create_apa_inputs<-function(merged_counts,meta,c1,c2,c1_nm,c2_nm,out,plot_corr=FALSE)
+create_apa_inputs<-function(merged_counts,meta,c1,c2='all',c1_nm,c2_nm,out,plot_corr=FALSE)
 {
+  if(c2=='all')
+  {
+   # save c2 as all clusters except c1
+   all_clus<-meta$seurat_clusters %>% unique() %>% as.numeric()
+   rem<-match(c1,all_clus)
+   c2<-all_clus[-rem]
+  }
   
   # Create subset peak matrix for each cluster
   c1_peaks<-subset_peaks_by_clus(c1,merged_counts,meta)
@@ -93,28 +100,27 @@ create_apa_inputs<-function(merged_counts,meta,c1,c2,c1_nm,c2_nm,out,plot_corr=F
   
 }
 
-
-##### This function creates replicates for each cluster by sampling barcode #####
+##### This function creates replicates for each cluster using barcodes from previous sampling performed using MURP #####
 # clus_name: name of cluster to create replicates for
 # peak_mat: peak x cell matrix corresponding to that cluster
 # nrep: number of replicates to create (with replacement). Default is 2
-# p: proportion of total cells to sample. Default is 0.7
-# seed: seed value. Default is 123
 
-create_replicates2<-function(bc_dir,clus_name,nrep=2,peak_clus_mat)
+
+create_replicates<-function(clus_name,peak_mat,nrep=2,p=0.7,seed=123)
 {
+  
+  bc<-colnames(peak_mat)
+  ncell<-length(bc)
   
   rep<-list()
   
+  set.seed(seed)
   for(i in 1:nrep)
   {
-    nm<-paste0(clus_name,'_',i)
-    bc_file<-paste0(bc_dir,nm,'.tsv')
-    tab<-read.table(bc_file,header=FALSE)
-    subset_bc<-tab$V1
-    subset_mat<-peak_clus_mat[,subset_bc]
+    subset_bc<-sample(bc,(p*ncell),replace = FALSE)
+    subset_mat<-peak_mat[,subset_bc]
     rep[[i]]<-rowSums(subset_mat) %>% as.data.frame()
-    names(rep)[[i]]<-nm
+    names(rep)[[i]]<-paste0(clus_name,'_',i)
   }
   
   return(rep)
@@ -131,7 +137,7 @@ create_replicates2<-function(bc_dir,clus_name,nrep=2,peak_clus_mat)
 subset_peaks_by_clus<-function(clus,merged_counts,meta)
 {
   ## extract cluster cell barcodes ##
-  clus_idx<-which(meta$seurat_clusters==clus)
+  clus_idx<-which(meta$seurat_clusters %in% clus)
   clus_bc<-meta$bc[clus_idx]
   
   ## Subset peak counts data ##
@@ -559,31 +565,6 @@ get_final_APA_tab<-function(tab,g1,g2)
 
 
 #### Archive #######
-##### This function creates replicates for each cluster using barcodes from previous sampling performed using MURP #####
-# clus_name: name of cluster to create replicates for
-# peak_mat: peak x cell matrix corresponding to that cluster
-# nrep: number of replicates to create (with replacement). Default is 2
-
-
-create_replicates<-function(clus_name,peak_mat,nrep=2,p=0.7,seed=123)
-{
-  
-  bc<-colnames(peak_mat)
-  ncell<-length(bc)
-  
-  rep<-list()
-  
-  set.seed(seed)
-  for(i in 1:nrep)
-  {
-    subset_bc<-sample(bc,(p*ncell),replace = TRUE)
-    subset_mat<-peak_mat[,subset_bc]
-    rep[[i]]<-rowSums(subset_mat) %>% as.data.frame()
-    names(rep)[[i]]<-paste0(clus_name,'_',i)
-  }
-  
-  return(rep)
-}
 
 
 
@@ -640,6 +621,33 @@ create_apa_inputs<-function(merged_counts,meta,c1,c2,c1_nm,c2_nm,out,plot_corr=F
   
   return(list(peak_mat,meanmat))
   
+}
+
+
+##### This function creates replicates for each cluster by sampling barcode #####
+# clus_name: name of cluster to create replicates for
+# peak_mat: peak x cell matrix corresponding to that cluster
+# nrep: number of replicates to create (with replacement). Default is 2
+# p: proportion of total cells to sample. Default is 0.7
+# seed: seed value. Default is 123
+
+create_replicates2<-function(bc_dir,clus_name,nrep=2,peak_clus_mat)
+{
+  
+  rep<-list()
+  
+  for(i in 1:nrep)
+  {
+    nm<-paste0(clus_name,'_',i)
+    bc_file<-paste0(bc_dir,nm,'.tsv')
+    tab<-read.table(bc_file,header=FALSE)
+    subset_bc<-tab$V1
+    subset_mat<-peak_clus_mat[,subset_bc]
+    rep[[i]]<-rowSums(subset_mat) %>% as.data.frame()
+    names(rep)[[i]]<-nm
+  }
+  
+  return(rep)
 }
 
 
