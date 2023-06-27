@@ -20,8 +20,8 @@ peaks_file=argv[6] # Enter peaks ref directly
 #dir<-'/home/sonas/beegfs//APA/scPASU/'
 #gtf_file<-"/home/sonas/beegfs/ref/refdata-gex-GRCh38-2020-A/genes/genes.gtf"
 
-script_dir<-paste0(dir,'/scripts/')
-source(paste0(script_dir,'/scPASU_functions.R'))
+script_dir<-paste0(dir,'/Scripts/')
+source(paste0(script_dir,'/3_peak_ref_cleanup/scPASU_functions.R'))
 
 outdir<-paste0(dir,'/output/3_RefinePeakRef/3a_assign_TU/')
 inputdir<-paste0(dir,'/input/')
