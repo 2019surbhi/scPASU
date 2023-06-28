@@ -27,12 +27,30 @@ extn=100
 #extn=125
 #extn=149
 
-dir='/home/sonas/beegfs/APA/scPASU/'
-peaks_ref_dir='/home/sonas/beegfs/APA/scPASU/output/3_RefinePeakRef/3a_assign_TU/e'${extn}'/'
-file_prefix='u10_uro'
-gtf_file='/home/sonas/beegfs/ref/refdata-gex-GRCh38-2020-A/genes/genes.gtf'
-out_dir=${dir}'output/3_RefinePeakRef/3a_assign_TU/'
+# dir='/home/sonas/beegfs/APA/scPASU/'
+#peaks_ref_dir='/home/sonas/beegfs/APA/scPASU/output/3_RefinePeakRef/3a_assign_TU/e'${extn}'/'
+#file_prefix='u10_uro'
+#gtf_file='/home/sonas/beegfs/ref/refdata-gex-GRCh38-2020-A/genes/genes.gtf'
+#out_dir=${dir}'output/3_RefinePeakRef/3a_assign_TU/'
 
+#### Updated path for Ninh and Justin ###
+
+#Please change the dir path to where you place the scPASU dir (Create `input' and 'output' dir within the scPASU dir)
+dir='/path/to/your_dir/'
+
+# Create 3_RefinePeakRef/3a_assign_TU/e100/ (Go to scPASU/output directory and use mkdir -p 3_RefinePeakRef/3a_assign_TU/
+# Then download and place e100 within 3a_assign_TU
+peaks_ref_dir=${dir}/scPASU/output/2_/2c_intersect/e100/
+
+# Change the path to where you have gtf file in your reference folder
+gtf_file='/home/sonas/beegfs/ref/refdata-gex-GRCh38-2020-A/genes/genes.gtf'
+
+out_dir=${dir}/scPASU/output/3_RefinePeakRef/3a_assign_TU/'
+
+file_prefix='u10_uro'
 
 Rscript ${dir}/scripts/2_assign_tu.R 30 ${dir} ${peaks_ref_dir} ${file_prefix} ${out_dir} ${gtf_file}
 
+# You should have the following files within your ${dir}/scPASU/input/ folder:
+# 1. GRCh38_gene_biotypes.csv
+# 2. genes.rds (optional)
