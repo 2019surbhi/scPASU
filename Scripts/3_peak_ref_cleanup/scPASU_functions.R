@@ -236,8 +236,7 @@ getGenes2 <- function(geneset="ucsc",gencodetable=NULL,genome,cachedir=NULL,sync
 {
     # Validate geneset
     if(!(geneset %in% c("ucsc","refseq","gencode","ensembl"))){stop("geneset must be one of \"ucsc\", \"refseq\", \"gencode\", or \"ensembl\"")}
-    if((geneset=="gencode")&(is.null(gencodetable))){stop("Please provide the UCSC Genome Browser table name for the GENCODE gene build of interest (for example: w
-gEncodeGencodeBasicV19)")}
+    if((geneset=="gencode")&(is.null(gencodetable))){stop("Please provide the UCSC Genome Browser table name for the GENCODE gene build of interest (for example: wgEncodeGencodeBasicV19)")}
 
     if(geneset=="ucsc")
     {
