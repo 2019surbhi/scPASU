@@ -5,6 +5,9 @@
 # hg38 polya db: atlas.clusters.2.0.GRCh38.96.bed  (downloaded from :https://polyasite.unibas.ch/atlas#2)
 # hg19 db: polyAsite_v1_hg19_clusters.bed
 
+
+source('scPASU_plotting_functions.R')
+
 #####################################################################
 
 ### Step 1. Prep data ###
