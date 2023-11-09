@@ -1,4 +1,4 @@
-# This code is modified from Ting lab's bulk APA pipeline to repurpose it for scRNA APA analysis
+# This code is adapted from Ting lab's bulk APA pipeline to repurpose it for scRNA APA analysis
 # Author: Surbhi Sona
 
 # original script from bulkAPA pipeline: '08_pas_stats_figure.r'
