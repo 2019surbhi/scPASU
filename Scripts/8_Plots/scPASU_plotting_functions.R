@@ -14,6 +14,7 @@ library(GenomicRanges)
 library(BSgenome.Hsapiens.UCSC.hg38)
 library(BSgenome.Hsapiens.UCSC.hg19)
 
+#### Hexamer plotting functions ####
 
 countHexes <- function(gr,us=50)
 {
