@@ -1,0 +1,84 @@
+cff-version: 1.2.0
+message: >-
+  If you use this software, please cite the scPASU paper listed
+  under preferred-citation below.
+title: >-
+  scPASU: a pipeline to repurpose scRNA-seq data for single cell
+  polyadenylation analysis
+abstract: >-
+  Original source repository for scPASU, a pipeline that repurposes
+  3' scRNA-seq data for alternative polyadenylation analysis by
+  generating a dataset-specific poly(A) site reference. Developed
+  2022-2023 at the Lerner Research Institute, Cleveland Clinic.
+  This repository is the source from which the release accompanying
+  the publication (https://doi.org/10.5281/zenodo.14498599) was
+  derived.
+type: software
+authors:
+  - given-names: Surbhi
+  - family-names: Sona
+  - orcid: "https://orcid.org/0000-0002-6644-8970" 
+  - affiliation: "Lerner Research Institute, Cleveland Clinic"
+  - current affiliation: St Jude Children's Hospital 
+version: "1.0.0"
+date-released: "2026-09-10"                          
+license: CC-BY-4.0
+repository-code: "https://github.com/2019surbhi/scPASU"
+keywords:
+  - alternative polyadenylation
+  - single-cell RNA-seq
+  - poly(A) site usage
+  - bioinformatics
+  - APA
+
+preferred-citation:
+  type: article
+  title: >-
+    Differentiation in the human urothelia is defined by distinct
+    alternative polyadenylation
+  authors:
+    - given-names: Ninh B.
+      family-names: Le
+    - given-names: Surbhi
+      family-names: Sona
+    - given-names: Briana
+      family-names: Santo
+    - given-names: Yi
+      family-names: Zhang
+    - given-names: Rosie
+      family-names: Ou
+    - given-names: R. Allen
+      family-names: Schweickart
+    - given-names: Veena
+      family-names: Kochat
+    - given-names: William I.
+      family-names: Padron
+    - given-names: Shih-Han
+      family-names: Lee
+    - given-names: Joo Mi
+      family-names: Yi
+    - given-names: Shih-Han
+      family-names:Lee
+    - given-names: Oliver
+      family-names: Wessely
+    - given-names: Byron H.
+      family-names: Lee
+    - given-names: Angela H.
+      family-names: Ting
+  journal: "Cell Reports"
+  year: 2026
+  doi: "https://doi.org/10.1016/j.celrep.2025.116839"
+
+references:
+  - type: software
+    title: "ninhleba/scPASU_pipeline"
+    notes: >-
+      Release accompanying the publication, derived from this
+      repository.
+    authors:
+      - given-names: Ninh B.
+        family-names: Le
+      - given-names: Surbhi
+        family-names: Sona
+    doi: "10.5281/zenodo.14498599"
+    repository-code: "https://github.com/ninhleba/scPASU_pipeline"

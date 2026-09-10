@@ -1,0 +1,43 @@
+{
+  "title": "scPASU: a pipeline to repurpose scRNA-seq data for single cell polyadenylation analysis",
+  "upload_type": "software",
+  "description": "<p>Original source repository for scPASU, a pipeline that repurposes 3' scRNA-seq data for alternative polyadenylation analysis by generating a dataset-specific poly(A) site reference. Developed 2022-2023 at the Lerner Research Institute, Cleveland Clinic.</p><p>This repository is the source from which the release accompanying the publication (<a href=\"https://doi.org/10.5281/zenodo.14498599\">10.5281/zenodo.14498599</a>) was derived. Please cite the Cell Reports paper.</p>",
+  "creators": [
+    {
+      "name": "Sona, Surbhi",
+      "orcid": "0000-0000-0000-0000",
+      "affiliation": "Lerner Research Institute, Cleveland Clinic"
+    }
+  ],
+  "license": "cc-by-4.0",
+  "access_right": "open",
+  "version": "1.0.0",
+  "language": "eng",
+  "keywords": [
+    "alternative polyadenylation",
+    "single-cell RNA-seq",
+    "poly(A) site usage",
+    "bioinformatics",
+    "APA"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "10.1016/j.celrep.2025.116839",
+      "relation": "isSupplementTo",
+      "resource_type": "publication-article",
+      "scheme": "doi"
+    },
+    {
+      "identifier": "10.5281/zenodo.14498599",
+      "relation": "isSourceOf",
+      "resource_type": "software",
+      "scheme": "doi"
+    },
+    {
+      "identifier": "https://github.com/ninhleba/scPASU_pipeline",
+      "relation": "isSourceOf",
+      "resource_type": "software",
+      "scheme": "url"
+    }
+  ]
+}
