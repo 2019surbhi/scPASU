@@ -52,6 +52,7 @@
 
 
 ## II. Generate Peak by Cell Matrix #####
-*
+* Use PA reference to generate peak counts per cell
 
 ## III. Perform APA analysis #####
+* Perform per cell APA analysis adapting bulk APA analysis code
